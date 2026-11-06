@@ -11,8 +11,11 @@ import Equipe from "./pages/Equipe";
 import Suivi from "./pages/Suivi";
 import Confidentialite from "./pages/Confidentialite";
 import NotFound from "./pages/NotFound";
-import Admin from "./pages/Admin";
-import { useEffect } from "react";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { lazy, Suspense, useEffect } from "react";
+
+// L'espace équipe n'est utile qu'à quelques personnes : il est chargé à la demande, pas pour chaque visiteur.
+const Admin = lazy(() => import("./pages/Admin"));
 
 // Remet la page en haut à chaque changement de route (sauf navigation vers une ancre #...).
 function ScrollToTop() {
@@ -36,6 +39,7 @@ function PagePublique() {
       <NavBar />
       {/* key = chemin : la transition d'entrée rejoue à chaque page, mais pas quand seul un filtre change. */}
       <div id="contenu" key={pathname} className="page-enter">
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Accueil />} />
           <Route path="/opportunites" element={<Repertoire />} />
@@ -48,6 +52,7 @@ function PagePublique() {
           <Route path="/confidentialite" element={<Confidentialite />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </ErrorBoundary>
       </div>
       <Footer />
     </>
@@ -60,7 +65,14 @@ export default function App() {
       <ScrollToTop />
       <Routes>
         {/* L'espace équipe a sa propre page de connexion, sans la nav publique */}
-        <Route path="/admin" element={<Admin />} />
+        <Route
+          path="/admin"
+          element={
+            <Suspense fallback={<p className="p-8 text-center text-sm text-muted">Chargement…</p>}>
+              <Admin />
+            </Suspense>
+          }
+        />
         <Route path="*" element={<PagePublique />} />
       </Routes>
     </div>

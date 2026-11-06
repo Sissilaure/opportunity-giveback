@@ -42,13 +42,14 @@ export default function Footer() {
             Give Back, 2iE.
           </p>
         </div>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 md:contents">
         {COLONNES.map((col) => (
           <div key={col.titre}>
             <p className="text-xs font-bold uppercase tracking-widest text-muted">{col.titre}</p>
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-2">
               {col.liens.map((lien) => (
                 <li key={lien.label}>
-                  <Link to={lien.to} className="text-sm text-ink hover:text-primary hover:underline">
+                  <Link to={lien.to} className="inline-block py-2.5 text-sm text-ink hover:text-primary hover:underline">
                     {lien.label}
                   </Link>
                 </li>
@@ -56,6 +57,7 @@ export default function Footer() {
             </ul>
           </div>
         ))}
+        </div>
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-6xl px-5 py-4 text-xs text-muted sm:px-8">

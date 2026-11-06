@@ -18,6 +18,14 @@ export default function NavBar() {
   const fermerMenu = () => setMenuOuvert(false);
   const [defile, setDefile] = useState(false);
 
+  // Échap ferme le menu mobile ; le menu se referme aussi à chaque changement de page.
+  useEffect(() => {
+    if (!menuOuvert) return undefined;
+    const onKey = (e) => e.key === "Escape" && setMenuOuvert(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOuvert]);
+
   useEffect(() => {
     const onScroll = () => setDefile(window.scrollY > 8);
     onScroll();
@@ -30,8 +38,10 @@ export default function NavBar() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-8 sm:py-4">
         <Link to="/" aria-label="Accueil" onClick={fermerMenu} className="group flex items-center gap-2.5 sm:gap-3">
           <img
-            src="/logo.png"
+            src="/logo-96.png"
             alt=""
+            width="44"
+            height="44"
             className="h-9 w-9 shrink-0 rounded-full shadow-card transition-transform duration-300 ease-out group-hover:rotate-6 group-hover:scale-105 sm:h-11 sm:w-11"
           />
           <span className="font-display text-lg font-semibold tracking-tight sm:text-2xl">
@@ -73,14 +83,15 @@ export default function NavBar() {
           onClick={() => setMenuOuvert((v) => !v)}
           aria-label={menuOuvert ? "Fermer le menu" : "Ouvrir le menu"}
           aria-expanded={menuOuvert}
-          className="rounded-lg p-2 text-ink sm:hidden"
+          aria-controls="menu-mobile"
+          className="-mr-2 rounded-lg p-3 text-ink sm:hidden"
         >
           {menuOuvert ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
         </button>
       </div>
 
       {menuOuvert && (
-        <nav className="border-t border-line bg-surface px-5 py-2 sm:hidden">
+        <nav id="menu-mobile" aria-label="Menu principal" className="animate-fade-up border-t border-line bg-surface px-5 pb-4 pt-2 sm:hidden">
           <div className="flex flex-col">
             {LIENS.map((lien) => {
               const actif = estActif(location.pathname, lien.href);
@@ -89,14 +100,25 @@ export default function NavBar() {
                   key={lien.href}
                   to={lien.href}
                   onClick={fermerMenu}
-                  className={`rounded-lg px-2 py-3 text-sm font-medium ${
-                    actif ? "text-primary" : "text-ink"
+                  aria-current={actif ? "page" : undefined}
+                  className={`rounded-lg px-2 py-3.5 text-base font-medium ${
+                    actif ? "bg-primary-light text-primary" : "text-ink"
                   }`}
                 >
                   {lien.label}
                 </Link>
               );
             })}
+            <Link to="/suivi" onClick={fermerMenu} className="rounded-lg px-2 py-3.5 text-base font-medium text-ink">
+              Mon suivi
+            </Link>
+            <Link
+              to="/opportunites"
+              onClick={fermerMenu}
+              className="mt-2 rounded-xl bg-primary px-4 py-3.5 text-center text-base font-semibold text-white"
+            >
+              Explorer les opportunités
+            </Link>
           </div>
         </nav>
       )}

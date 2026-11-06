@@ -49,7 +49,7 @@ export default function RessourceDetail() {
       {ressource && (
         <>
           <div className="mt-4">
-            <span className="inline-block rounded bg-canvas px-2 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+            <span className="inline-block rounded bg-canvas px-2 py-0.5 text-xs font-semibold tracking-wide text-ink">
               {LABELS[ressource.type] || ressource.type}
             </span>
             <h1 className="mt-2 font-display text-2xl font-semibold leading-snug text-ink">{ressource.titre}</h1>

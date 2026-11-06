@@ -16,4 +16,10 @@ describe("FilterTabs", () => {
     fireEvent.click(screen.getByText("Stages"));
     expect(onChange).toHaveBeenCalledWith("stage");
   });
+
+  it("signale le filtre actif aux lecteurs d'écran (aria-pressed)", () => {
+    render(<FilterTabs value="stage" onChange={() => {}} />);
+    expect(screen.getByText("Stages")).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Bourses")).toHaveAttribute("aria-pressed", "false");
+  });
 });

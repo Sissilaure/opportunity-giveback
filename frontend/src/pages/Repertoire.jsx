@@ -18,20 +18,44 @@ export default function Repertoire() {
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
 
+  const [tentative, setTentative] = useState(0);
+  const [lent, setLent] = useState(false);
+
   useEffect(() => {
+    // `actuel` écarte les réponses arrivées après une recherche plus récente (sinon l'ancienne écrase la nouvelle).
+    let actuel = true;
     const delai = setTimeout(() => {
       setChargement(true);
       fetchOpportunites({ q, type })
         .then((data) => {
+          if (!actuel) return;
           setOpportunites(data.opportunites);
           setErreur(null);
         })
-        .catch(() => setErreur("Impossible de charger les opportunités. Vérifiez votre connexion."))
-        .finally(() => setChargement(false));
+        .catch(() => {
+          if (!actuel) return;
+          setErreur("Impossible de charger les opportunités. Vérifiez votre connexion.");
+        })
+        .finally(() => {
+          if (actuel) setChargement(false);
+        });
     }, 250);
 
-    return () => clearTimeout(delai);
-  }, [q, type]);
+    return () => {
+      actuel = false;
+      clearTimeout(delai);
+    };
+  }, [q, type, tentative]);
+
+  // Un hébergement gratuit met jusqu'à une minute à se réveiller : on prévient au lieu de laisser un écran figé.
+  useEffect(() => {
+    if (!chargement) return undefined;
+    const t = setTimeout(() => setLent(true), 4000);
+    return () => {
+      clearTimeout(t);
+      setLent(false);
+    };
+  }, [chargement]);
 
   return (
     <main>
@@ -73,8 +97,20 @@ export default function Repertoire() {
         <p className="mb-3 mt-8 text-xs font-bold uppercase tracking-widest text-muted">Parcourir toutes les opportunités</p>
 
         {erreur && (
-          <p role="alert" className="rounded-lg bg-danger-bg px-4 py-3 text-sm font-medium text-danger">
-            {erreur}
+          <div role="alert" className="flex flex-col gap-3 rounded-lg bg-danger-bg px-4 py-3 text-sm font-medium text-danger sm:flex-row sm:items-center sm:justify-between">
+            <span>{erreur}</span>
+            <button
+              onClick={() => setTentative((n) => n + 1)}
+              className="min-h-[40px] rounded-lg bg-danger px-4 py-2 font-semibold text-white hover:brightness-110"
+            >
+              Réessayer
+            </button>
+          </div>
+        )}
+
+        {chargement && lent && !erreur && (
+          <p role="status" className="mb-4 rounded-lg bg-accent-light px-4 py-3 text-sm text-ink">
+            Le serveur démarre, cela peut prendre quelques secondes. Merci de patienter…
           </p>
         )}
 

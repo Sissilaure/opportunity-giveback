@@ -115,4 +115,16 @@ h3 {
   .reveal { opacity: 1; transform: none; }
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+/* Mobile : pas de zoom automatique d'iOS à la saisie (police < 16px), pas de double-tap-zoom sur les contrôles,
+   et respect de l'encoche / de la barre de gestes. */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]), textarea, select { font-size: 16px !important; }
+}
+a, button, summary, label, input, select, textarea { touch-action: manipulation; }
+button, a { -webkit-tap-highlight-color: rgba(27, 42, 74, 0.08); }
+body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+footer { padding-bottom: env(safe-area-inset-bottom); }
+:focus-visible { outline: 2px solid #1B2A4A; outline-offset: 2px; border-radius: 4px; }
+

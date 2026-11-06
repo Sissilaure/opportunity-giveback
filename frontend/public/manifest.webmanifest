@@ -1,0 +1,14 @@
+{
+  "name": "Opportunity Hub",
+  "short_name": "Opportunity Hub",
+  "description": "Bourses, stages, emplois et concours vérifiés pour les étudiants et jeunes diplômés africains.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#FAF9F6",
+  "theme_color": "#1B2A4A",
+  "icons": [
+    { "src": "/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -50,7 +50,7 @@ export default function Ressources() {
                 style={{ "--delay": `${i * 70}ms` }}
                 className="animate-fade-up group flex flex-col rounded-card border border-line bg-surface p-4 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
               >
-                <span className="inline-block w-fit rounded bg-canvas px-2 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
+                <span className="inline-block w-fit rounded bg-canvas px-2 py-0.5 text-xs font-semibold tracking-wide text-ink">
                   {LABELS[r.type] || r.type}
                 </span>
                 <h3 className="mt-2 font-display text-lg font-bold leading-snug text-ink">{r.titre}</h3>

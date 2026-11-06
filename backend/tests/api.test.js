@@ -408,4 +408,17 @@ describe("Sécurité", () => {
     expect(res.status).toBe(503);
     expect(res.body.error).not.toMatch(/gemini|clé/i);
   });
+
+  it("met en cache les lectures publiques mais jamais l'espace équipe", async () => {
+    const publique = await request(app).get("/api/equipe");
+    expect(publique.headers["cache-control"]).toMatch(/public, max-age=30/);
+    const admin = await request(app).get("/api/admin/me");
+    expect(admin.headers["cache-control"]).toBe("no-store");
+  });
+
+  it("compresse les réponses JSON volumineuses", async () => {
+    const res = await request(app).get("/api/equipe").set("Accept-Encoding", "gzip");
+    // Réponse petite : pas forcément compressée, mais l'en-tête Vary prouve que la négociation est active.
+    expect(res.headers["vary"]).toMatch(/Accept-Encoding/i);
+  });
 });

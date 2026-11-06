@@ -4,6 +4,7 @@ import { fetchOpportunite } from "../lib/api";
 import { estSuivi, toggleSuivi } from "../lib/suivi";
 import { lienSur } from "../lib/url";
 import { imageOpportunite } from "../lib/types";
+import { telechargerICS } from "../lib/calendrier";
 import useTitre from "../hooks/useTitre";
 import TypeBadge from "../components/TypeBadge";
 import VerifiedBadge from "../components/VerifiedBadge";
@@ -59,6 +60,31 @@ export default function FicheDetaillee() {
     setSuivi(toggleSuivi(id));
   }
 
+  const [message, setMessage] = useState("");
+  const annoncer = (texte) => {
+    setMessage(texte);
+    setTimeout(() => setMessage(""), 3000);
+  };
+
+  // Partage natif sur mobile (WhatsApp, etc.), sinon copie du lien : le canal n°1 de diffusion ici est WhatsApp.
+  async function handlePartager() {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: opp.titre, text: `${opp.titre} — ${opp.organisme}`, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      annoncer("Lien copié dans le presse-papiers.");
+    } catch (err) {
+      if (err?.name !== "AbortError") annoncer("Impossible de partager ce lien.");
+    }
+  }
+
+  function handleCalendrier() {
+    if (!telechargerICS(opp, window.location.href)) annoncer("Cette opportunité n'a pas de date limite.");
+  }
+
   if (chargement) {
     return (
       <main className="mx-auto max-w-2xl px-5 pt-6 sm:px-8 sm:pt-10" aria-busy="true">
@@ -85,7 +111,7 @@ export default function FicheDetaillee() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <Link to="/opportunites" className="inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-primary">
+      <Link to="/opportunites" className="-ml-1 inline-flex items-center gap-1 py-2 pr-3 text-sm font-medium text-ink hover:text-primary">
         <ChevronLeftIcon className="h-4 w-4" /> Opportunités
       </Link>
 
@@ -181,6 +207,25 @@ export default function FicheDetaillee() {
           {suivi && <CheckIcon className="h-4 w-4" />}
           {suivi ? "Dans mon suivi" : "Ajouter à mon suivi"}
         </button>
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={handlePartager}
+            className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface py-3 text-sm font-semibold text-ink transition hover:border-primary"
+          >
+            Partager
+          </button>
+          {opp.dateEcheance && opp.statutEcheance !== "depassee" && (
+            <button
+              onClick={handleCalendrier}
+              className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface py-3 text-sm font-semibold text-ink transition hover:border-primary"
+            >
+              Rappel calendrier
+            </button>
+          )}
+        </div>
+        <p role="status" aria-live="polite" className="min-h-[1.25rem] text-center text-sm text-success">
+          {message}
+        </p>
         {suivi && (
           <Link to="/suivi" className="animate-pop-in block text-center text-sm font-medium text-primary hover:underline">
             Voir mon suivi →

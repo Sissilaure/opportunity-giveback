@@ -4,7 +4,7 @@ export default function TypeBadge({ type }) {
   const style = TYPE_STYLES[type];
   return (
     <span
-      className={`inline-block rounded px-2 py-0.5 text-[11px] font-bold tracking-wide ${
+      className={`inline-block rounded px-2 py-0.5 text-xs font-bold tracking-wide ${
         style ? style.badge : "bg-canvas text-ink"
       }`}
     >

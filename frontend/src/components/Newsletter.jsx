@@ -43,6 +43,8 @@ export default function Newsletter() {
             id="newsletter-email"
             type="email"
             required
+            autoComplete="email"
+            inputMode="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="prenom@exemple.com"
@@ -56,14 +58,14 @@ export default function Newsletter() {
                 { value: "hebdomadaire", label: "Une fois par semaine" },
                 { value: "immediate", label: "Dès qu'une opportunité est publiée" },
               ].map((opt) => (
-                <label key={opt.value} className="flex items-center gap-2">
+                <label key={opt.value} className="flex min-h-[44px] items-center gap-2.5">
                   <input
                     type="radio"
                     name="frequence"
                     value={opt.value}
                     checked={frequence === opt.value}
                     onChange={() => setFrequence(opt.value)}
-                    className="accent-accent"
+                    className="h-5 w-5 accent-accent"
                   />
                   {opt.label}
                 </label>
@@ -87,12 +89,12 @@ export default function Newsletter() {
           </p>
 
           {statut === "sent" && (
-            <p className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-sm text-success">
+            <p role="status" className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-sm text-success">
               Merci ! Votre inscription est enregistrée.
             </p>
           )}
           {statut === "error" && (
-            <p className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{erreur}</p>
+            <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{erreur}</p>
           )}
         </form>
       </div>

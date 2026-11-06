@@ -201,6 +201,17 @@ Photos : [Pexels](https://www.pexels.com) (licence libre, attribution non requis
 `frontend/public/images`. L'image d'une opportunité dépend de son type ; une même catégorie en alterne
 quelques-unes selon l'identifiant.
 
+### Mobile et performance
+
+- Testé de 320 à 1280 px : aucun débordement horizontal ; zones tactiles ≥ 40 px ; police des champs à 16 px sur
+  mobile (pas de zoom automatique d'iOS) ; encoche/barre de gestes respectées (`viewport-fit=cover`).
+- Menu mobile complet (Échap, `aria-current`), filtres défilants avec `aria-pressed`.
+- Fiche : bouton **Partager** (partage natif / copie du lien) et **Rappel calendrier** (.ics, alerte J-7).
+- Liste : réponses périmées ignorées, bouton « Réessayer », message si le serveur gratuit met du temps à démarrer.
+- Poids : logo ramené de 1,6 Mo à 16 Ko pour la barre de navigation ; espace équipe chargé à la demande ;
+  API compressée (gzip) avec cache public de 30 s sur les lectures (jamais sur `/api/admin`).
+- `ErrorBoundary` : plus de page blanche en cas d'erreur d'affichage. Manifeste web (ajout à l'écran d'accueil).
+
 ## Tests
 
 ```bash

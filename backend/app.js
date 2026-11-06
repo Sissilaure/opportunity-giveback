@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const compression = require("compression");
 const helmet = require("helmet");
 const session = require("express-session");
 const { AppError, asyncHandler, errorHandler } = require("./errors");
@@ -45,6 +46,8 @@ function createApp({ pool, sessionStore }) {
   // L'API ne sert que du JSON : en-têtes stricts, et ressources lisibles depuis le frontend (autre domaine).
   app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(cors({ origin: allowedOrigin, credentials: true }));
+  // JSON compressé : gain net sur les connexions mobiles lentes.
+  app.use(compression());
   app.use(express.json({ limit: "20kb" }));
   app.use(createOriginGuard(allowedOrigin));
   app.use(
@@ -72,6 +75,16 @@ function createApp({ pool, sessionStore }) {
       },
     })
   );
+
+  // Lectures publiques : cache court (le navigateur et le CDN évitent des allers-retours). L'espace équipe n'est jamais mis en cache.
+  app.use(["/api/opportunites", "/api/stats", "/api/equipe", "/api/temoignages", "/api/resources", "/api/faq"], (req, res, next) => {
+    if (req.method === "GET") res.set("Cache-Control", "public, max-age=30, stale-while-revalidate=120");
+    next();
+  });
+  app.use("/api/admin", (req, res, next) => {
+    res.set("Cache-Control", "no-store");
+    next();
+  });
 
   app.get("/api/health", (req, res) => res.json({ status: "ok" }));
 

@@ -227,7 +227,7 @@ export default function Accueil() {
                 titre="Les prochaines échéances"
                 texte="Des programmes vérifiés, ouverts aux candidatures. Chaque fiche renvoie vers la source officielle."
               />
-              <Link to="/opportunites" className="text-sm font-semibold text-primary hover:underline">
+              <Link to="/opportunites" className="inline-block py-2 text-sm font-semibold text-primary hover:underline">
                 Voir toutes les opportunités →
               </Link>
             </div>
@@ -354,7 +354,7 @@ export default function Accueil() {
                 );
               })}
             </Reveal>
-            <Link to="/aide" className="mt-5 inline-block text-sm font-semibold text-primary hover:underline">
+            <Link to="/aide" className="mt-4 inline-block py-2 text-sm font-semibold text-primary hover:underline">
               Voir toute la FAQ et poser une question →
             </Link>
           </div>
