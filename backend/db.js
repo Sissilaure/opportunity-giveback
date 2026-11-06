@@ -76,6 +76,16 @@ async function initializeQuestionsTable() {
 
 // Comptes de l'espace équipe : remplace l'ancien mot de passe unique partagé (ADMIN_PASSWORD)
 // par de vrais comptes avec mot de passe individuel haché.
+async function initializeNewsletterTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS newsletter_abonne (
+      email VARCHAR(255) PRIMARY KEY,
+      frequence ENUM('immediate', 'hebdomadaire') NOT NULL DEFAULT 'hebdomadaire',
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `);
+}
+
 async function initializeAdminTable() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS admin_user (
@@ -100,4 +110,4 @@ async function initializeAdminTable() {
   }
 }
 
-module.exports = { pool, initializeQuestionsTable, initializeAdminTable };
+module.exports = { pool, initializeQuestionsTable, initializeAdminTable, initializeNewsletterTable };

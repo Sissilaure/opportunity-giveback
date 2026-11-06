@@ -26,6 +26,22 @@ export async function rechercheIntelligente(description) {
   return request("/api/recherche-ia", { method: "POST", body: JSON.stringify({ description }) });
 }
 
+export async function fetchStats() {
+  return request("/api/stats");
+}
+
+export async function fetchEquipe() {
+  return request("/api/equipe");
+}
+
+export async function fetchTemoignages() {
+  return request("/api/temoignages");
+}
+
+export async function inscrireNewsletter(email, frequence) {
+  return request("/api/newsletter", { method: "POST", body: JSON.stringify({ email, frequence }) });
+}
+
 export async function fetchRessources() {
   return request("/api/resources");
 }

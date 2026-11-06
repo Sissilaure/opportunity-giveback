@@ -42,8 +42,8 @@ export default function Aide() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <p className="text-xs font-bold uppercase tracking-widest text-accent">Aide</p>
-      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Aide</h1>
+      <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Aide</p>
+      <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Aide</h1>
       <p className="mt-1 text-base italic text-muted">Une question ? Un blocage ?</p>
 
       <div className="relative mt-5 overflow-hidden rounded-card bg-ink p-5 text-white shadow-card-hover">
@@ -52,7 +52,7 @@ export default function Aide() {
           aria-hidden="true"
         />
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent">Canal d'orientation</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark">Canal d'orientation</p>
           <h2 className="mt-1 font-display text-2xl font-bold leading-snug">Vous n'êtes pas seul·e dans vos démarches</h2>
           <p className="mt-1 text-sm text-white/80">
             Posez une question, elle sera lue par un membre de l'équipe et vous orientera.

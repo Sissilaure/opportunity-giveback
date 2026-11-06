@@ -21,10 +21,18 @@ publié automatiquement.
 
 ## Aperçu du projet
 
-Le site a quatre parties publiques (Répertoire, Ressources, Aide) et un espace équipe
-protégé (`/admin`) :
+Ce dépôt est la **plateforme commune** issue de la charte de projet Give Back, 2iE : elle réunit
+le moteur d'Opportunity Hub (groupe 2 : catalogue vérifié, recherche IA, FAQ, espace équipe) et la
+charte visuelle et les contenus du site Africa Opportunities (groupe 1 : accueil, catégories, étapes,
+témoignages, équipe, newsletter).
 
-- **Répertoire** (`/`) — liste des opportunités vérifiées, filtrables par type, avec une
+Le site a une page d'accueil, cinq parties publiques et un espace équipe protégé (`/admin`) :
+
+- **Accueil** (`/`) — présentation, chiffres réels, catégories, prochaines échéances, étapes,
+  témoignages, FAQ et inscription aux alertes.
+- **Équipe** (`/equipe`) — présentation de l'équipe et accès au formulaire de contact.
+- **Confidentialité** (`/confidentialite`) — données collectées et usage de l'IA.
+- **Opportunités** (`/opportunites`, filtre `?type=bourse`) — liste des opportunités vérifiées, filtrables par type, avec une
   recherche classique par mots-clés et une **recherche intelligente** (langage naturel,
   via Gemini) qui classe les résultats par pertinence.
 - **Ressources** (`/ressources`) — guides pratiques (CV, lettre de motivation, vigilance
@@ -61,7 +69,9 @@ backend/
   errors.js / validate.js   # Middleware d'erreurs et de validation génériques
   rateLimit.js              # Limiteur de débit en mémoire (sans dépendance externe)
   *Routes.js                # Un routeur Express par ressource (admin, questions, ressources, faq...)
-  data/                     # Contenu JSON statique (FAQ, ressources, questions de démo)
+  contenuRoutes.js          # Équipe et témoignages (data/equipe.json, data/temoignages.json)
+  newsletterRoutes.js       # Inscription aux alertes (table newsletter_abonne, créée au démarrage)
+  data/                     # Contenu JSON statique (FAQ, ressources, équipe, témoignages, questions de démo)
   opportunites_reelles.sql  # Schéma complet + données de seed (à importer sur une base neuve)
   tests/api.test.js         # Suite de tests d'intégration (pool factice, aucune vraie base requise)
 
@@ -122,7 +132,7 @@ Sur une base neuve :
 mysql -h <host> -P <port> -u <user> -p --default-character-set=utf8mb4 <nom_base> < backend/opportunites_reelles.sql
 ```
 
-Les tables `question`, `admin_user` et `sessions` sont créées automatiquement par le
+Les tables `question`, `admin_user`, `newsletter_abonne` et `sessions` sont créées automatiquement par le
 backend à son premier démarrage (pas besoin de les inclure manuellement).
 
 **Important sur l'encodage** : toujours importer avec `--default-character-set=utf8mb4`

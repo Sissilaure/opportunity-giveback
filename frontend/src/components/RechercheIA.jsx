@@ -40,6 +40,10 @@ export default function RechercheIA() {
           Ex. « Je suis en Master 1, ressortissant d'Afrique subsaharienne, je cherche une bourse pour l'Europe. »
         </p>
 
+        <p className="mt-2 text-xs text-muted">
+          L'IA peut se tromper : ses suggestions sont à vérifier. Consulte toujours la source officielle de chaque fiche avant de candidater.
+        </p>
+
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}

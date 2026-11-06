@@ -14,7 +14,7 @@ function formatDate(dateStr) {
 function Section({ titre, children }) {
   return (
     <div className="mt-5 border-t border-line pt-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-accent">{titre}</p>
+      <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark">{titre}</p>
       <div className="mt-2">{children}</div>
     </div>
   );
@@ -48,7 +48,7 @@ export default function FicheDetaillee() {
   if (erreur) {
     return (
       <main className="mx-auto max-w-2xl px-5 pt-6 sm:px-8 sm:pt-10">
-        <Link to="/" className="inline-flex items-center gap-1 text-sm font-medium text-ink">
+        <Link to="/opportunites" className="inline-flex items-center gap-1 text-sm font-medium text-ink">
           <ChevronLeftIcon className="h-4 w-4" /> Répertoire
         </Link>
         <p className="mt-6 text-sm text-danger">{erreur}</p>
@@ -58,13 +58,13 @@ export default function FicheDetaillee() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <Link to="/" className="inline-flex items-center gap-1 text-sm font-medium text-ink">
+      <Link to="/opportunites" className="inline-flex items-center gap-1 text-sm font-medium text-ink">
         <ChevronLeftIcon className="h-4 w-4" /> Répertoire
       </Link>
 
       <div className="mt-4">
         <TypeBadge type={opp.type} />
-        <h1 className="mt-2 font-display text-2xl font-extrabold leading-snug tracking-tight text-ink sm:text-3xl">
+        <h1 className="mt-2 font-display text-2xl font-semibold leading-snug tracking-tight text-ink sm:text-3xl">
           {opp.titre}
         </h1>
         <p className="mt-1 text-base italic text-muted">{opp.organisme}</p>
@@ -106,7 +106,7 @@ export default function FicheDetaillee() {
               opp.statutEcheance === "proche" || opp.statutEcheance === "depassee" ? "bg-danger-bg" : "bg-canvas"
             }`}
           >
-            <span className="font-display text-4xl font-extrabold text-ink">
+            <span className="font-display text-4xl font-semibold text-ink">
               {opp.statutEcheance === "depassee" ? "Clos" : `${opp.joursRestants}j`}
             </span>
             <div>

@@ -287,3 +287,44 @@ describe("Admin - opportunités", () => {
     expect(res.status).toBe(503);
   });
 });
+
+describe("GET /api/stats", () => {
+  it("renvoie les totaux réels des opportunités publiées", async () => {
+    pool.query
+      .mockResolvedValueOnce([[{ type: "bourse", total: 4 }, { type: "stage", total: 2 }], []])
+      .mockResolvedValueOnce([[{ organismes: 5 }], []]);
+    const res = await request(app).get("/api/stats");
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ total: 6, organismes: 5, parType: { bourse: 4, stage: 2 } });
+  });
+});
+
+describe("Contenu éditorial", () => {
+  it("renvoie l'équipe", async () => {
+    const res = await request(app).get("/api/equipe");
+    expect(res.status).toBe(200);
+    expect(res.body.length).toBeGreaterThan(0);
+    expect(res.body[0]).toHaveProperty("nom");
+  });
+
+  it("renvoie les témoignages", async () => {
+    const res = await request(app).get("/api/temoignages");
+    expect(res.status).toBe(200);
+    expect(res.body[0]).toHaveProperty("texte");
+  });
+});
+
+describe("POST /api/newsletter", () => {
+  it("rejette une adresse invalide avant toute requête SQL", async () => {
+    const res = await request(app).post("/api/newsletter").send({ email: "pas-un-email" });
+    expect(res.status).toBe(400);
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+
+  it("enregistre l'inscription, fréquence hebdomadaire par défaut", async () => {
+    pool.query.mockResolvedValueOnce([{ affectedRows: 1 }, []]);
+    const res = await request(app).post("/api/newsletter").send({ email: " Test@Exemple.org " });
+    expect(res.status).toBe(201);
+    expect(pool.query.mock.calls[0][1]).toEqual(["test@exemple.org", "hebdomadaire"]);
+  });
+});

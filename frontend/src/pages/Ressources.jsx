@@ -24,8 +24,8 @@ export default function Ressources() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <p className="text-xs font-bold uppercase tracking-widest text-accent">Ressources</p>
-      <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">Ressources</h1>
+      <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Ressources</p>
+      <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Ressources</h1>
       <p className="mt-1 text-base italic text-muted">Guides, modèles et réponses</p>
 
       {chargement && <p className="mt-6 text-sm text-muted">Chargement…</p>}

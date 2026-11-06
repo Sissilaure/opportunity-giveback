@@ -76,8 +76,8 @@ export default function Admin() {
           </Link>
         </div>
         <div className="w-full max-w-md rounded-card border border-line bg-surface p-6 shadow-card-hover">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent">Espace équipe</p>
-          <h1 className="mt-1 font-display text-2xl font-extrabold text-ink">Connexion</h1>
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark">Espace équipe</p>
+          <h1 className="mt-1 font-display text-2xl font-semibold text-ink">Connexion</h1>
           <p className="mt-0.5 text-sm text-muted">Réservé aux membres de l'équipe.</p>
 
           <input
@@ -126,8 +126,8 @@ export default function Admin() {
       </div>
 
       <div className="mt-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-accent">Espace équipe</p>
-        <h1 className="mt-1 font-display text-2xl font-extrabold text-ink">Questions reçues</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark">Espace équipe</p>
+        <h1 className="mt-1 font-display text-2xl font-semibold text-ink">Questions reçues</h1>
       </div>
 
       <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted">

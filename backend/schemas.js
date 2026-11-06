@@ -18,6 +18,11 @@ const questionSchema = z.object({
   texte: z.string().trim().min(1, "La question ne peut pas être vide.").max(2000, "La question dépasse 2000 caractères."),
 });
 
+const newsletterSchema = z.object({
+  email: z.string().trim().toLowerCase().email("Adresse email invalide.").max(255),
+  frequence: z.enum(["immediate", "hebdomadaire"]).optional().default("hebdomadaire"),
+});
+
 const answerSchema = z.object({
   reponse: z.string().trim().min(1, "La réponse ne peut pas être vide."),
 });
@@ -55,6 +60,7 @@ module.exports = {
   opportunitesQuerySchema,
   loginSchema,
   questionSchema,
+  newsletterSchema,
   answerSchema,
   rechercheIaSchema,
   opportuniteAdminSchema,

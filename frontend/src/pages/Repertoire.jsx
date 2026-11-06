@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { fetchOpportunites } from "../lib/api";
 import SearchBar from "../components/SearchBar";
 import FilterTabs from "../components/FilterTabs";
@@ -7,7 +8,10 @@ import RechercheIA from "../components/RechercheIA";
 
 export default function Repertoire() {
   const [q, setQ] = useState("");
-  const [type, setType] = useState("toutes");
+  // Le filtre de type vit dans l'URL (?type=bourse) pour que les catégories de l'accueil y mènent directement.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const type = searchParams.get("type") || "toutes";
+  const setType = (valeur) => setSearchParams(valeur === "toutes" ? {} : { type: valeur });
   const [opportunites, setOpportunites] = useState([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
@@ -33,8 +37,8 @@ export default function Repertoire() {
         <div className="mx-auto max-w-6xl px-5 pb-6 pt-6 sm:px-8 sm:pt-10">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-accent">Répertoire</p>
-              <h1 className="mt-1 font-display text-4xl font-extrabold tracking-tight text-ink sm:text-5xl">
+              <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Répertoire</p>
+              <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
                 Opportunités
               </h1>
               <p className="mt-1 text-base italic text-muted">Vérifiées pour votre avenir</p>
@@ -42,7 +46,7 @@ export default function Repertoire() {
 
             {!erreur && (
               <div className="flex items-baseline gap-2 sm:flex-col sm:items-end sm:gap-0">
-                <span className="font-display text-4xl font-extrabold text-primary">
+                <span className="font-display text-4xl font-semibold text-primary">
                   {chargement ? "…" : opportunites.length}
                 </span>
                 <span className="text-sm font-semibold text-muted">

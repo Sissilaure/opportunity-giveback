@@ -1,7 +1,7 @@
 require("dotenv").config();
 const cron = require("node-cron");
 const createApp = require("./app");
-const { pool, initializeQuestionsTable, initializeAdminTable } = require("./db");
+const { pool, initializeQuestionsTable, initializeAdminTable, initializeNewsletterTable } = require("./db");
 const { rechercherNouvellesOpportunites } = require("./discoveryIA");
 const { marquerExpirees } = require("./opportunites");
 const MySQLSessionStore = require("./sessionStore");
@@ -37,7 +37,7 @@ async function cycleAutomatique() {
   }
 }
 
-Promise.all([initializeQuestionsTable(), initializeAdminTable()])
+Promise.all([initializeQuestionsTable(), initializeAdminTable(), initializeNewsletterTable()])
   .then(() => {
     app.listen(PORT, () => console.log(`Backend Opportunity Hub sur http://localhost:${PORT}`));
 

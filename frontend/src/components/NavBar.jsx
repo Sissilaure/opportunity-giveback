@@ -3,11 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import { MenuIcon, CloseIcon } from "./icons";
 
 const LIENS = [
-  { href: "/", label: "Répertoire" },
+  { href: "/opportunites", label: "Opportunités" },
   { href: "/ressources", label: "Ressources" },
+  { href: "/equipe", label: "Équipe" },
   { href: "/aide", label: "Aide" },
-  { href: "/admin", label: "Espace équipe" },
 ];
+
+// Les sous-pages (ex. /opportunites/12) gardent leur entrée de menu active.
+const estActif = (pathname, href) => pathname === href || pathname.startsWith(`${href}/`);
 
 export default function NavBar() {
   const location = useLocation();
@@ -23,7 +26,7 @@ export default function NavBar() {
             alt=""
             className="h-9 w-9 shrink-0 rounded-full shadow-card transition-transform duration-300 ease-out group-hover:rotate-6 group-hover:scale-105 sm:h-11 sm:w-11"
           />
-          <span className="font-display text-lg font-extrabold tracking-tight sm:text-2xl">
+          <span className="font-display text-lg font-semibold tracking-tight sm:text-2xl">
             <span className="text-ink">Opportunity</span>{" "}
             <span
               className="bg-[length:200%_auto] bg-gradient-to-r from-accent via-[#EAD08A] to-accent bg-clip-text text-transparent transition-[background-position] duration-700 ease-out group-hover:bg-[position:100%_0]"
@@ -34,9 +37,9 @@ export default function NavBar() {
           </span>
         </Link>
 
-        <nav className="hidden gap-5 sm:flex">
+        <nav className="hidden items-center gap-6 sm:flex">
           {LIENS.map((lien) => {
-            const actif = location.pathname === lien.href;
+            const actif = estActif(location.pathname, lien.href);
             return (
               <Link
                 key={lien.href}
@@ -50,6 +53,12 @@ export default function NavBar() {
               </Link>
             );
           })}
+          <Link
+            to="/opportunites"
+            className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:bg-primary-dark"
+          >
+            Explorer
+          </Link>
         </nav>
 
         <button
@@ -66,7 +75,7 @@ export default function NavBar() {
         <nav className="border-t border-line bg-surface px-5 py-2 sm:hidden">
           <div className="flex flex-col">
             {LIENS.map((lien) => {
-              const actif = location.pathname === lien.href;
+              const actif = estActif(location.pathname, lien.href);
               return (
                 <Link
                   key={lien.href}

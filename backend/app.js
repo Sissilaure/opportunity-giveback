@@ -8,6 +8,8 @@ const { formatOpportunite } = require("./opportunites");
 
 const resourcesRoutes = require("./resourcesRoutes");
 const faqRoutes = require("./faqRoutes");
+const contenuRoutes = require("./contenuRoutes");
+const createNewsletterRouter = require("./newsletterRoutes");
 const createQuestionsRouter = require("./questionsRoutes");
 const createAdminRouter = require("./adminRoutes");
 const createRechercheIaRouter = require("./rechercheIaRoutes");
@@ -132,12 +134,30 @@ function createApp({ pool, sessionStore }) {
     }),
   );
 
+  // Chiffres réels pour l'accueil : uniquement les opportunités publiées (statut 'verifiee').
+  app.get(
+    "/api/stats",
+    asyncHandler(async (req, res) => {
+      const [parType] = await pool.query(
+        "SELECT type, COUNT(*) AS total FROM opportunite WHERE statut = 'verifiee' GROUP BY type",
+      );
+      const [[{ organismes }]] = await pool.query(
+        "SELECT COUNT(DISTINCT id_structure) AS organismes FROM opportunite WHERE statut = 'verifiee'",
+      );
+      const parTypeMap = Object.fromEntries(parType.map((r) => [r.type, Number(r.total)]));
+      const total = Object.values(parTypeMap).reduce((a, b) => a + b, 0);
+      res.json({ total, organismes: Number(organismes), parType: parTypeMap });
+    }),
+  );
+
   app.use("/api/recherche-ia", createRechercheIaRouter(pool));
 
   // ---------- Ressources pratiques / Canal d'orientation ----------
 
   app.use("/api/resources", resourcesRoutes);
   app.use("/api/faq", faqRoutes);
+  app.use("/api", contenuRoutes);
+  app.use("/api/newsletter", createNewsletterRouter(pool));
   app.use("/api/questions", createQuestionsRouter(pool));
   app.use("/api/admin/opportunites", createAdminOpportunitesRouter(pool));
   app.use("/api/admin", createAdminRouter(pool));
