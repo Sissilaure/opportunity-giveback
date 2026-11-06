@@ -8,6 +8,7 @@ const COLONNES = [
       { to: "/opportunites?type=bourse", label: "Bourses" },
       { to: "/opportunites?type=stage", label: "Stages" },
       { to: "/opportunites?type=concours", label: "Concours" },
+      { to: "/suivi", label: "Mon suivi" },
     ],
   },
   {

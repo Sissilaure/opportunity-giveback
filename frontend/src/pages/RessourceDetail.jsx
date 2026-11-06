@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchRessource } from "../lib/api";
 import { renderMarkdownLite } from "../lib/markdown";
+import useTitre from "../hooks/useTitre";
 import { ChevronLeftIcon, ChevronRightIcon } from "../components/icons";
 
 const LABELS = {
@@ -13,9 +14,9 @@ const LABELS = {
 
 // Après avoir lu le guide, l'action naturelle diffère selon son propos.
 const CTA_PAR_TYPE = {
-  cv: { label: "Parcourir les opportunités", to: "/" },
-  lettre: { label: "Parcourir les opportunités", to: "/" },
-  checklist: { label: "Parcourir les opportunités", to: "/" },
+  cv: { label: "Parcourir les opportunités", to: "/opportunites" },
+  lettre: { label: "Parcourir les opportunités", to: "/opportunites" },
+  checklist: { label: "Parcourir les opportunités", to: "/opportunites" },
   vigilance: { label: "Une annonce vous semble douteuse ? Posez la question", to: "/aide" },
 };
 
@@ -31,6 +32,8 @@ export default function RessourceDetail() {
       .catch(() => setErreur("Ressource introuvable."))
       .finally(() => setChargement(false));
   }, [id]);
+
+  useTitre(ressource?.titre);
 
   const cta = ressource ? CTA_PAR_TYPE[ressource.type] : null;
 
@@ -49,7 +52,7 @@ export default function RessourceDetail() {
             <span className="inline-block rounded bg-canvas px-2 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
               {LABELS[ressource.type] || ressource.type}
             </span>
-            <h1 className="mt-2 font-display text-xl font-bold leading-snug text-ink">{ressource.titre}</h1>
+            <h1 className="mt-2 font-display text-2xl font-semibold leading-snug text-ink">{ressource.titre}</h1>
             <p className="mt-1 text-sm text-muted">{ressource.description}</p>
           </div>
 

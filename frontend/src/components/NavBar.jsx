@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { MenuIcon, CloseIcon } from "./icons";
 
@@ -16,9 +16,17 @@ export default function NavBar() {
   const location = useLocation();
   const [menuOuvert, setMenuOuvert] = useState(false);
   const fermerMenu = () => setMenuOuvert(false);
+  const [defile, setDefile] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setDefile(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-10 border-b border-line bg-surface/90 shadow-header backdrop-blur">
+    <header className={`sticky top-0 z-10 border-b border-line bg-surface/90 backdrop-blur transition-shadow duration-300 ${defile ? "shadow-header" : ""}`}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-8 sm:py-4">
         <Link to="/" aria-label="Accueil" onClick={fermerMenu} className="group flex items-center gap-2.5 sm:gap-3">
           <img

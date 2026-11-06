@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchRessources } from "../lib/api";
 import { ChevronRightIcon } from "../components/icons";
+import useTitre from "../hooks/useTitre";
 
 const LABELS = {
   cv: "Modèle",
@@ -11,6 +12,7 @@ const LABELS = {
 };
 
 export default function Ressources() {
+  useTitre("Ressources");
   const [ressources, setRessources] = useState([]);
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
@@ -41,11 +43,12 @@ export default function Ressources() {
         <>
           <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted">À consulter</p>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {ressources.map((r) => (
+            {ressources.map((r, i) => (
               <Link
                 key={r.id}
                 to={`/ressources/${r.id}`}
-                className="group flex flex-col rounded-card border border-line bg-surface p-4 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
+                style={{ "--delay": `${i * 70}ms` }}
+                className="animate-fade-up group flex flex-col rounded-card border border-line bg-surface p-4 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
               >
                 <span className="inline-block w-fit rounded bg-canvas px-2 py-0.5 text-[11px] font-semibold tracking-wide text-ink">
                   {LABELS[r.type] || r.type}

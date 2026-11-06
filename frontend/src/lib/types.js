@@ -16,3 +16,29 @@ export const TYPE_STYLES = {
   concours: { bar: "bg-feature", badge: "bg-feature-bg text-feature" },
   autre: { bar: "bg-muted", badge: "bg-canvas text-muted" },
 };
+
+// Visuel par catégorie (photos libres de droits Pexels, hébergées dans /public/images).
+export const TYPE_IMAGES = {
+  bourse: "/images/bourse.jpg",
+  stage: "/images/stage.jpg",
+  emploi: "/images/emploi.jpg",
+  concours: "/images/concours.jpg",
+  autre: "/images/autre.jpg",
+};
+
+export const imageDuType = (type) => TYPE_IMAGES[type] || TYPE_IMAGES.autre;
+
+// Quelques variantes par type, choisies selon l'id : une liste de 4 bourses n'affiche pas 4 fois la même photo,
+// et une opportunité garde toujours la même image d'une visite à l'autre.
+const VARIANTES = {
+  bourse: ["bourse", "campus", "accompagnement"],
+  stage: ["stage", "emploi"],
+  emploi: ["emploi", "stage"],
+  concours: ["concours", "autre"],
+  autre: ["autre", "campus"],
+};
+
+export function imageOpportunite({ id, type }) {
+  const noms = VARIANTES[type] || VARIANTES.autre;
+  return `/images/${noms[Math.abs(Number(id) || 0) % noms.length]}.jpg`;
+}

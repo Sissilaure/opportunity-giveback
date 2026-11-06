@@ -1,13 +1,25 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
 
+// Les erreurs portent `status` (0 = serveur injoignable) pour que l'interface adapte son message.
+function apiError(message, status) {
+  const err = new Error(message);
+  err.status = status;
+  return err;
+}
+
 async function request(path, options = {}) {
-  const res = await fetch(`${API_URL}${path}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
+  let res;
+  try {
+    res = await fetch(`${API_URL}${path}`, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      ...options,
+    });
+  } catch {
+    throw apiError("Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.", 0);
+  }
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || data.erreur || "Une erreur est survenue.");
+  if (!res.ok) throw apiError(data.error || data.erreur || "Une erreur est survenue.", res.status);
   return data;
 }
 

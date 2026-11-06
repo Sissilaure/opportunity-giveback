@@ -1,6 +1,7 @@
 const { generateJson } = require("./gemini");
 const { fetchOpportunitesVerifiees, findOrCreateStructure } = require("./opportunites");
 const { TYPES_OPPORTUNITE } = require("./schemas");
+const { safeHttpUrl } = require("./security");
 
 // Important : la clé Gemini gratuite de ce projet n'a pas accès au "grounding" Google Search
 // (quota 429 constaté), donc ce prompt s'appuie sur les connaissances propres du modèle, pas
@@ -54,23 +55,31 @@ async function rechercherNouvellesOpportunites(pool) {
     }
     if (!TYPES_OPPORTUNITE.includes(p.type)) continue;
 
+    // Sortie d'IA = entrée non fiable : lien http(s) obligatoire, longueurs bornées aux colonnes SQL.
+    const lienSource = safeHttpUrl(p.lienSource);
+    if (!lienSource || lienSource.length > 500) continue;
+    const siteWeb = safeHttpUrl(p.siteWeb);
+    const titre = p.titre.trim().slice(0, 255);
+    const organisme = p.organisme.trim().slice(0, 255);
+    if (!titre || !organisme) continue;
+
     // Évite les doublons évidents (même titre déjà en base, publié ou en attente de vérification).
-    const [dup] = await pool.query("SELECT id FROM opportunite WHERE titre = ?", [p.titre]);
+    const [dup] = await pool.query("SELECT id FROM opportunite WHERE titre = ?", [titre]);
     if (dup.length > 0) continue;
 
-    const idStructure = await findOrCreateStructure(pool, p.organisme.trim(), p.siteWeb);
+    const idStructure = await findOrCreateStructure(pool, organisme, siteWeb && siteWeb.length <= 255 ? siteWeb : null);
     await pool.query(
       `INSERT INTO opportunite
          (titre, type, id_structure, public_eligible, criteres, pieces_requises, date_echeance, lien_source, date_verification, statut)
        VALUES (?, ?, ?, ?, ?, ?, NULL, ?, NULL, 'a_verifier')`,
       [
-        p.titre.trim(),
+        titre,
         p.type,
         idStructure,
-        typeof p.publicEligible === "string" ? p.publicEligible : "",
+        typeof p.publicEligible === "string" ? p.publicEligible.slice(0, 2000) : "",
         Array.isArray(p.criteres) ? p.criteres.filter((c) => typeof c === "string").join("\n") : "",
         Array.isArray(p.piecesRequises) ? p.piecesRequises.filter((c) => typeof c === "string").join("\n") : "",
-        p.lienSource.trim(),
+        lienSource,
       ],
     );
     ajoutees += 1;

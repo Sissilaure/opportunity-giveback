@@ -8,6 +8,7 @@ import {
 } from "../lib/api";
 import TypeBadge from "./TypeBadge";
 import { ExternalLinkIcon } from "./icons";
+import { lienSur } from "../lib/url";
 
 const TYPES = ["bourse", "stage", "emploi", "concours", "autre"];
 
@@ -234,14 +235,20 @@ export default function AdminOpportunites() {
             </div>
             <p className="mt-1 text-sm text-muted">{o.organisme}</p>
             {o.publicEligible && <p className="mt-2 text-sm text-ink/80">{o.publicEligible}</p>}
-            <a
-              href={o.lienSource}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-            >
-              Vérifier la source <ExternalLinkIcon className="h-3.5 w-3.5" />
-            </a>
+            {lienSur(o.lienSource) ? (
+              <a
+                href={lienSur(o.lienSource)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              >
+                Vérifier la source <ExternalLinkIcon className="h-3.5 w-3.5" />
+              </a>
+            ) : (
+              <p className="mt-2 text-sm font-medium text-danger">
+                Lien source invalide ou dangereux : à corriger ou à rejeter.
+              </p>
+            )}
             <div className="mt-3 flex gap-2">
               <button
                 onClick={() => handleApprouver(o.id)}

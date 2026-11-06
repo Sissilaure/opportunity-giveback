@@ -14,6 +14,7 @@ publié automatiquement.
 - [Variables d'environnement](#variables-denvironnement)
 - [Base de données](#base-de-données)
 - [Fonctionnalités clés](#fonctionnalités-clés)
+- [Sécurité](#sécurité)
 - [Tests](#tests)
 - [Déploiement actuel](#déploiement-actuel)
 - [Limites connues](#limites-connues)
@@ -30,6 +31,7 @@ Le site a une page d'accueil, cinq parties publiques et un espace équipe proté
 
 - **Accueil** (`/`) — présentation, chiffres réels, catégories, prochaines échéances, étapes,
   témoignages, FAQ et inscription aux alertes.
+- **Mon suivi** (`/suivi`) — opportunités mises de côté, stockées sur l'appareil (sans compte).
 - **Équipe** (`/equipe`) — présentation de l'équipe et accès au formulaire de contact.
 - **Confidentialité** (`/confidentialite`) — données collectées et usage de l'IA.
 - **Opportunités** (`/opportunites`, filtre `?type=bourse`) — liste des opportunités vérifiées, filtrables par type, avec une
@@ -167,6 +169,37 @@ opportunités déjà vérifiées par pertinence, avec une raison courte pour cha
 Les sessions de connexion sont stockées dans la table MySQL `sessions` (voir
 `backend/sessionStore.js`), pas en mémoire — un redémarrage du serveur (courant sur un
 hébergement gratuit qui se met en veille) ne déconnecte donc pas l'équipe.
+
+## Sécurité
+
+Mesures en place (et testées dans `backend/tests/api.test.js`) :
+
+- **Liens** : seuls les liens `http(s)` sont acceptés à l'écriture (admin et propositions de l'IA) **et**
+  filtrés à la lecture, côté API (`security.js`) et côté interface (`frontend/src/lib/url.js`). Un lien
+  `javascript:` ou `data:` ne devient jamais cliquable.
+- **CSRF** : en production le cookie de session est `SameSite=None` (frontend et backend sur deux
+  domaines). Toute écriture dont l'en-tête `Origin` n'est pas `FRONTEND_URL` est refusée (403).
+- **Session** : `SESSION_SECRET` est obligatoire en production (le serveur refuse de démarrer sans) ;
+  l'identifiant de session est régénéré à la connexion ; cookie `httpOnly` + `secure`.
+- **En-têtes HTTP** : `helmet` côté API ; en-têtes (CSP, `X-Frame-Options`, `nosniff`, `Referrer-Policy`,
+  `Permissions-Policy`) côté frontend dans `frontend/vercel.json`.
+- **Abus** : limite globale par IP sur `/api`, limites plus strictes sur la connexion, les questions, la
+  newsletter et les appels à l'IA ; corps JSON limité à 20 Ko.
+- **IA** : sa sortie est traitée comme une entrée non fiable (liens vérifiés, longueurs bornées). Les messages
+  publics ne révèlent jamais la configuration (ex. clé absente).
+- **Dépendances** : `npm audit --omit=dev` ne signale plus que `zod` (alerte sur de très grosses collections,
+  non applicable ici) ; sa mise à jour en v4 est un changement majeur à faire à part.
+
+## Design et animations
+
+Charte reprise du site Africa Opportunities (groupe 1) : Fraunces + Inter, bleu nuit, crème, or, vert.
+Animations en CSS pur (`index.css`, `Reveal.jsx`, `CountUp.jsx`) : apparition au défilement, compteurs,
+transition de page, squelettes de chargement. Elles sont désactivées pour les personnes qui demandent de
+réduire les animations (`prefers-reduced-motion`).
+
+Photos : [Pexels](https://www.pexels.com) (licence libre, attribution non requise), hébergées dans
+`frontend/public/images`. L'image d'une opportunité dépend de son type ; une même catégorie en alterne
+quelques-unes selon l'identifiant.
 
 ## Tests
 

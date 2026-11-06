@@ -1,4 +1,7 @@
+import useTitre from "../hooks/useTitre";
+
 export default function Confidentialite() {
+  useTitre("Confidentialité");
   return (
     <main className="mx-auto max-w-2xl px-5 pb-14 pt-6 sm:px-8 sm:pt-10">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Confidentialité</p>

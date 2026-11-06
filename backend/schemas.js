@@ -1,5 +1,14 @@
 const { z } = require("zod");
 
+// z.string().url() accepte `javascript:` : on exige explicitement http(s).
+const urlHttp = (message, max) =>
+  z
+    .string()
+    .trim()
+    .max(max, message)
+    .url(message)
+    .refine((v) => /^https?:\/\//i.test(v), message);
+
 const TYPES_OPPORTUNITE = ["bourse", "stage", "emploi", "concours", "autre"];
 
 const opportunitesQuerySchema = z.object({
@@ -41,7 +50,7 @@ const opportuniteAdminSchema = z.object({
   titre: z.string().trim().min(3, "Titre trop court.").max(255),
   type: z.enum(TYPES_OPPORTUNITE),
   organisme: z.string().trim().min(2, "Nom de l'organisme requis.").max(255),
-  siteWeb: z.string().trim().max(255).optional().default(""),
+  siteWeb: z.union([urlHttp("Site web invalide.", 255), z.literal("")]).optional().default(""),
   publicEligible: z.string().trim().max(2000).optional().default(""),
   criteres: z.string().trim().max(4000).optional().default(""),
   piecesRequises: z.string().trim().max(4000).optional().default(""),
@@ -52,7 +61,7 @@ const opportuniteAdminSchema = z.object({
     .optional()
     .or(z.literal(""))
     .transform((v) => (v ? v : null)),
-  lienSource: z.string().trim().url("URL invalide."),
+  lienSource: urlHttp("URL invalide (http ou https).", 500),
 });
 
 module.exports = {

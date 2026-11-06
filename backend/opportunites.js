@@ -1,3 +1,5 @@
+const { safeHttpUrl } = require("./security");
+
 const SEUIL_ALERTE_JOURS = 15;
 
 function formatOpportunite(row) {
@@ -19,14 +21,15 @@ function formatOpportunite(row) {
     titre: row.titre,
     type: row.type,
     organisme: row.organisme,
-    siteWeb: row.site_web,
+    siteWeb: safeHttpUrl(row.site_web),
     publicEligible: row.public_eligible,
     criteres: (row.criteres || "").split("\n").filter(Boolean),
     piecesRequises: (row.pieces_requises || "").split("\n").filter(Boolean),
     dateEcheance: row.date_echeance,
     joursRestants,
     statutEcheance,
-    lienSource: row.lien_source,
+    // Filtré aussi à la lecture : des lignes anciennes ou proposées par l'IA pourraient contenir un lien non http(s).
+    lienSource: safeHttpUrl(row.lien_source),
     dateVerification: row.date_verification,
     statut: row.statut,
   };

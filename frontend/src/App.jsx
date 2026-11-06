@@ -1,42 +1,67 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import Accueil from "./pages/Accueil";
 import Repertoire from "./pages/Repertoire";
-import Equipe from "./pages/Equipe";
-import Confidentialite from "./pages/Confidentialite";
 import FicheDetaillee from "./pages/FicheDetaillee";
 import Ressources from "./pages/Ressources";
 import RessourceDetail from "./pages/RessourceDetail";
 import Aide from "./pages/Aide";
+import Equipe from "./pages/Equipe";
+import Suivi from "./pages/Suivi";
+import Confidentialite from "./pages/Confidentialite";
+import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
+import { useEffect } from "react";
+
+// Remet la page en haut à chaque changement de route (sauf navigation vers une ancre #...).
+function ScrollToTop() {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    if (!hash) window.scrollTo(0, 0);
+  }, [pathname, hash]);
+  return null;
+}
+
+function PagePublique() {
+  const { pathname } = useLocation();
+  return (
+    <>
+      <a
+        href="#contenu"
+        className="sr-only z-50 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white focus:not-sr-only focus:fixed focus:left-4 focus:top-4"
+      >
+        Aller au contenu
+      </a>
+      <NavBar />
+      {/* key = chemin : la transition d'entrée rejoue à chaque page, mais pas quand seul un filtre change. */}
+      <div id="contenu" key={pathname} className="page-enter">
+        <Routes>
+          <Route path="/" element={<Accueil />} />
+          <Route path="/opportunites" element={<Repertoire />} />
+          <Route path="/opportunites/:id" element={<FicheDetaillee />} />
+          <Route path="/ressources" element={<Ressources />} />
+          <Route path="/ressources/:id" element={<RessourceDetail />} />
+          <Route path="/aide" element={<Aide />} />
+          <Route path="/equipe" element={<Equipe />} />
+          <Route path="/suivi" element={<Suivi />} />
+          <Route path="/confidentialite" element={<Confidentialite />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
+      <Footer />
+    </>
+  );
+}
 
 export default function App() {
   return (
     <div className="min-h-screen bg-canvas">
+      <ScrollToTop />
       <Routes>
         {/* L'espace équipe a sa propre page de connexion, sans la nav publique */}
         <Route path="/admin" element={<Admin />} />
-
-        <Route
-          path="*"
-          element={
-            <>
-              <NavBar />
-              <Routes>
-                <Route path="/" element={<Accueil />} />
-                <Route path="/opportunites" element={<Repertoire />} />
-                <Route path="/opportunites/:id" element={<FicheDetaillee />} />
-                <Route path="/ressources" element={<Ressources />} />
-                <Route path="/ressources/:id" element={<RessourceDetail />} />
-                <Route path="/aide" element={<Aide />} />
-                <Route path="/equipe" element={<Equipe />} />
-                <Route path="/confidentialite" element={<Confidentialite />} />
-              </Routes>
-              <Footer />
-            </>
-          }
-        />
+        <Route path="*" element={<PagePublique />} />
       </Routes>
     </div>
   );

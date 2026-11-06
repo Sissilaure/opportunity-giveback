@@ -2,29 +2,45 @@ import { Link } from "react-router-dom";
 import TypeBadge from "./TypeBadge";
 import EcheanceBadge from "./EcheanceBadge";
 import VerifiedBadge from "./VerifiedBadge";
-import { TYPE_STYLES } from "../lib/types";
+import { TYPE_STYLES, imageOpportunite } from "../lib/types";
 
 export default function OpportuniteCard({ opportunite }) {
   const style = TYPE_STYLES[opportunite.type];
   return (
     <Link
       to={`/opportunites/${opportunite.id}`}
-      className="group relative block overflow-hidden rounded-card border border-line bg-surface p-4 pl-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
+      className="group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
     >
-      <span
-        className={`absolute inset-y-0 left-0 w-1 ${style ? style.bar : "bg-muted"}`}
-        aria-hidden="true"
-      />
-      <TypeBadge type={opportunite.type} />
-      <h3 className="mt-2 font-display text-lg font-bold leading-snug text-ink">{opportunite.titre}</h3>
-      <p className="mt-0.5 text-sm text-muted">{opportunite.organisme}</p>
-
-      <div className="mt-3 flex flex-wrap gap-2">
-        <VerifiedBadge date={opportunite.dateVerification} />
-        <EcheanceBadge
-          statutEcheance={opportunite.statutEcheance}
-          joursRestants={opportunite.joursRestants}
+      <div className="relative aspect-[16/9] overflow-hidden bg-primary-light">
+        <img
+          src={imageOpportunite(opportunite)}
+          alt=""
+          loading="lazy"
+          width="1000"
+          height="563"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/60 via-transparent to-transparent" aria-hidden="true" />
+        <div className="absolute left-3 top-3 rounded bg-surface/95 shadow-card">
+          <TypeBadge type={opportunite.type} />
+        </div>
+        <span
+          className={`absolute inset-x-0 bottom-0 h-1 ${style ? style.bar : "bg-muted"}`}
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="font-display text-lg font-semibold leading-snug text-ink">{opportunite.titre}</h3>
+        <p className="mt-0.5 text-sm text-muted">{opportunite.organisme}</p>
+
+        <div className="mt-auto flex flex-wrap gap-2 pt-3">
+          <VerifiedBadge date={opportunite.dateVerification} />
+          <EcheanceBadge
+            statutEcheance={opportunite.statutEcheance}
+            joursRestants={opportunite.joursRestants}
+          />
+        </div>
       </div>
     </Link>
   );

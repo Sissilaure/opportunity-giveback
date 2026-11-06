@@ -1,8 +1,11 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const session = require("express-session");
 const { AppError, asyncHandler, errorHandler } = require("./errors");
 const validate = require("./validate");
+const createRateLimiter = require("./rateLimit");
+const { createOriginGuard } = require("./security");
 const { opportunitesQuerySchema } = require("./schemas");
 const { formatOpportunite } = require("./opportunites");
 
@@ -33,8 +36,21 @@ function createApp({ pool, sessionStore }) {
     );
   }
 
+  // Sans secret propre, les cookies de session seraient signés avec une valeur publique (visible dans le code).
+  if (isProd && !process.env.SESSION_SECRET) {
+    throw new Error("SESSION_SECRET est obligatoire en production.");
+  }
+
+  app.disable("x-powered-by");
+  // L'API ne sert que du JSON : en-têtes stricts, et ressources lisibles depuis le frontend (autre domaine).
+  app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
   app.use(cors({ origin: allowedOrigin, credentials: true }));
-  app.use(express.json());
+  app.use(express.json({ limit: "20kb" }));
+  app.use(createOriginGuard(allowedOrigin));
+  app.use(
+    "/api",
+    createRateLimiter({ windowMs: 60 * 1000, max: 300, message: "Trop de requêtes, réessayez dans une minute." }),
+  );
 
   // Session pour l'espace équipe (Ressources/Aide). Stockée en base (sessionStore) en
   // production : sans ça, un redémarrage/réveil du service (courant sur un hébergement

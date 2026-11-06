@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { fetchFaq, fetchQuestionsRepondues, envoyerQuestion } from "../lib/api";
 import { ChevronDownIcon } from "../components/icons";
+import useTitre from "../hooks/useTitre";
 
 export default function Aide() {
+  useTitre("Aide");
   const [faq, setFaq] = useState([]);
   const [questionsRepondues, setQuestionsRepondues] = useState([]);
   const [openFaqId, setOpenFaqId] = useState(null);

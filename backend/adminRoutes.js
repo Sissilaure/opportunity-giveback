@@ -39,6 +39,8 @@ function createAdminRouter(pool) {
         throw new AppError(401, "Identifiants incorrects.");
       }
 
+      // Nouvel identifiant de session à la connexion : empêche la fixation de session.
+      await new Promise((resolve, reject) => req.session.regenerate((err) => (err ? reject(err) : resolve())));
       req.session.isAdmin = true;
       req.session.adminId = user.id;
       req.session.adminEmail = user.email;

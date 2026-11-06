@@ -9,20 +9,28 @@ import VerifiedBadge from "./VerifiedBadge";
 export default function RechercheIA() {
   const [description, setDescription] = useState("");
   const [statut, setStatut] = useState("idle");
-  const [erreur, setErreur] = useState("");
+  const [probleme, setProbleme] = useState(null);
   const [resultats, setResultats] = useState([]);
 
   async function handleRecherche() {
     const contenu = description.trim();
     if (!contenu) return;
     setStatut("loading");
-    setErreur("");
+    setProbleme(null);
     try {
       const data = await rechercheIntelligente(contenu);
       setResultats(data.resultats);
       setStatut("done");
     } catch (err) {
-      setErreur(err.message);
+      // 400 = saisie à corriger. Tout le reste (service indisponible, quota, réseau) n'est pas
+      // la faute de la personne : on le dit calmement et on oriente vers la recherche classique.
+      const saisieInvalide = err.status === 400;
+      setProbleme({
+        saisieInvalide,
+        message: saisieInvalide
+          ? err.message
+          : "La recherche intelligente est momentanément indisponible. En attendant, utilisez la barre de recherche ou les filtres : toutes les opportunités vérifiées restent accessibles.",
+      });
       setStatut("error");
     }
   }
@@ -35,21 +43,25 @@ export default function RechercheIA() {
       />
       <div className="relative">
         <p className="text-xs font-bold uppercase tracking-widest text-feature">Recherche intelligente · bêta</p>
-        <h2 className="mt-1 font-display text-xl font-bold text-ink">Décris ta situation</h2>
+        <h2 className="mt-1 font-display text-xl font-semibold text-ink">Décrivez votre situation</h2>
         <p className="mt-1 text-sm text-muted">
           Ex. « Je suis en Master 1, ressortissant d'Afrique subsaharienne, je cherche une bourse pour l'Europe. »
         </p>
-
         <p className="mt-2 text-xs text-muted">
-          L'IA peut se tromper : ses suggestions sont à vérifier. Consulte toujours la source officielle de chaque fiche avant de candidater.
+          L'IA peut se tromper : ses suggestions sont à vérifier. Consultez toujours la source officielle de chaque fiche avant de candidater.
         </p>
 
+        <label htmlFor="recherche-ia" className="sr-only">
+          Décrivez votre profil et ce que vous cherchez
+        </label>
         <textarea
+          id="recherche-ia"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && e.metaKey && handleRecherche()}
+          onKeyDown={(e) => e.key === "Enter" && (e.metaKey || e.ctrlKey) && handleRecherche()}
           rows={3}
-          placeholder="Décris ton profil et ce que tu cherches…"
+          maxLength={500}
+          placeholder="Décrivez votre profil et ce que vous cherchez…"
           className="mt-3 w-full rounded-lg border border-line bg-canvas p-3 text-sm text-ink placeholder:text-muted focus:border-feature focus:outline-none"
         />
         <button
@@ -60,7 +72,16 @@ export default function RechercheIA() {
           {statut === "loading" ? "Recherche en cours…" : "Rechercher avec l'IA"}
         </button>
 
-        {statut === "error" && <p className="mt-3 text-sm text-danger">{erreur}</p>}
+        {statut === "error" && probleme && (
+          <p
+            role="status"
+            className={`animate-pop-in mt-3 rounded-lg px-3 py-2.5 text-sm ${
+              probleme.saisieInvalide ? "bg-danger-bg text-danger" : "bg-accent-light text-ink"
+            }`}
+          >
+            {probleme.message}
+          </p>
+        )}
 
         {statut === "done" && resultats.length === 0 && (
           <p className="mt-4 text-sm text-muted">Aucune opportunité pertinente trouvée pour cette description.</p>
@@ -68,17 +89,18 @@ export default function RechercheIA() {
 
         {resultats.length > 0 && (
           <div className="mt-4 space-y-3">
-            {resultats.map((r) => (
+            {resultats.map((r, i) => (
               <Link
                 key={r.id}
                 to={`/opportunites/${r.id}`}
-                className="block rounded-xl border border-line bg-canvas p-4 transition hover:border-feature/40"
+                style={{ "--delay": `${i * 70}ms` }}
+                className="animate-fade-up block rounded-xl border border-line bg-canvas p-4 transition hover:border-feature/40 hover:shadow-card"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <TypeBadge type={r.type} />
                   <VerifiedBadge date={r.dateVerification} />
                 </div>
-                <h3 className="mt-2 font-display text-base font-bold text-ink">{r.titre}</h3>
+                <h3 className="mt-2 font-display text-base font-semibold text-ink">{r.titre}</h3>
                 <p className="text-sm text-muted">{r.organisme}</p>
                 {r.raisonIA && (
                   <p className="mt-2 border-l-2 border-feature pl-3 text-sm italic text-ink/80">{r.raisonIA}</p>

@@ -48,7 +48,7 @@ function createRechercheIaRouter(pool) {
     asyncHandler(async (req, res) => {
       const apiKey = process.env.GEMINI_API_KEY;
       if (!apiKey) {
-        throw new AppError(503, "Recherche intelligente indisponible : clé Gemini non configurée.");
+        throw new AppError(503, "La recherche intelligente est momentanément indisponible.");
       }
 
       const { description } = req.body;

@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import request from "supertest";
 import bcrypt from "bcryptjs";
 import createApp from "../app";
+import { safeHttpUrl } from "../security";
 
 // `pool` est un objet factice injecté directement dans l'app : aucun accès réseau,
 // aucune vraie base MySQL nécessaire pour vérifier le contrat HTTP de l'API.
@@ -326,5 +327,85 @@ describe("POST /api/newsletter", () => {
     const res = await request(app).post("/api/newsletter").send({ email: " Test@Exemple.org " });
     expect(res.status).toBe(201);
     expect(pool.query.mock.calls[0][1]).toEqual(["test@exemple.org", "hebdomadaire"]);
+  });
+});
+
+describe("Sécurité", () => {
+  it("safeHttpUrl n'accepte que http(s)", () => {
+    expect(safeHttpUrl("https://exemple.org/a")).toBe("https://exemple.org/a");
+    expect(safeHttpUrl(" http://exemple.org ")).toBe("http://exemple.org");
+    expect(safeHttpUrl("javascript:alert(1)")).toBeNull();
+    expect(safeHttpUrl("data:text/html,<script>alert(1)</script>")).toBeNull();
+    expect(safeHttpUrl("pas une url")).toBeNull();
+    expect(safeHttpUrl(null)).toBeNull();
+  });
+
+  it("neutralise un lien javascript: déjà présent en base", async () => {
+    pool.query.mockResolvedValueOnce([
+      [
+        {
+          id: 1,
+          titre: "Piégée",
+          type: "bourse",
+          organisme: "X",
+          site_web: "javascript:alert(1)",
+          lien_source: "javascript:alert(2)",
+          criteres: "",
+          pieces_requises: "",
+          date_echeance: null,
+          date_verification: "2026-01-01",
+        },
+      ],
+      [],
+    ]);
+    const res = await request(app).get("/api/opportunites/1");
+    expect(res.status).toBe(200);
+    expect(res.body.lienSource).toBeNull();
+    expect(res.body.siteWeb).toBeNull();
+  });
+
+  it("refuse un lien source javascript: côté admin", async () => {
+    const agent = request.agent(app);
+    const hash = await bcrypt.hash("motdepasse", 10);
+    pool.query.mockResolvedValueOnce([[{ id: 1, email: "admin@test.org", password_hash: hash }], []]);
+    await agent.post("/api/admin/login").send({ email: "admin@test.org", motDePasse: "motdepasse" });
+    const res = await agent.post("/api/admin/opportunites").send({
+      titre: "Piégée",
+      type: "bourse",
+      organisme: "Organisme Test",
+      lienSource: "javascript:alert(1)",
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("refuse une écriture venant d'une autre origine (CSRF)", async () => {
+    const res = await request(app)
+      .post("/api/newsletter")
+      .set("Origin", "https://site-malveillant.example")
+      .send({ email: "a@b.org" });
+    expect(res.status).toBe(403);
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+
+  it("accepte une écriture venant du frontend autorisé", async () => {
+    pool.query.mockResolvedValueOnce([{ affectedRows: 1 }, []]);
+    const res = await request(app)
+      .post("/api/newsletter")
+      .set("Origin", "http://localhost:5173")
+      .send({ email: "a@b.org" });
+    expect(res.status).toBe(201);
+  });
+
+  it("pose des en-têtes de sécurité et masque Express", async () => {
+    const res = await request(app).get("/api/health");
+    expect(res.headers["x-powered-by"]).toBeUndefined();
+    expect(res.headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  it("masque la raison de l'indisponibilité de l'IA au public", async () => {
+    delete process.env.GEMINI_API_KEY;
+    const res = await request(app).post("/api/recherche-ia").send({ description: "Master en Europe" });
+    expect(res.status).toBe(503);
+    expect(res.body.error).not.toMatch(/gemini|clé/i);
   });
 });

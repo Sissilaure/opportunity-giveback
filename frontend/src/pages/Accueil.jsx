@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { fetchOpportunites, fetchStats, fetchTemoignages, fetchFaq } from "../lib/api";
-import { TYPE_STYLES } from "../lib/types";
+import { TYPE_STYLES, TYPE_IMAGES } from "../lib/types";
+import useTitre from "../hooks/useTitre";
 import OpportuniteCard from "../components/OpportuniteCard";
 import Newsletter from "../components/Newsletter";
+import Reveal from "../components/Reveal";
+import CountUp from "../components/CountUp";
 import { ChevronRightIcon, ChevronDownIcon, CheckIcon } from "../components/icons";
 
 const CATEGORIES = [
@@ -54,26 +57,29 @@ const ARGUMENTS = [
 
 function SectionTitre({ surtitre, titre, texte }) {
   return (
-    <div className="max-w-2xl">
+    <Reveal className="max-w-2xl">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">{surtitre}</p>
       <h2 className="mt-1 font-display text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
         {titre}
       </h2>
       {texte && <p className="mt-2 text-base text-muted">{texte}</p>}
-    </div>
+    </Reveal>
   );
 }
 
 function Statistique({ valeur, libelle }) {
   return (
     <div>
-      <p className="font-display text-4xl font-semibold text-primary">{valeur}</p>
+      <p className="font-display text-5xl font-semibold text-primary">
+        <CountUp valeur={valeur} />
+      </p>
       <p className="mt-1 text-sm text-muted">{libelle}</p>
     </div>
   );
 }
 
 export default function Accueil() {
+  useTitre("");
   const { hash } = useLocation();
   const [stats, setStats] = useState(null);
   const [aLaUne, setALaUne] = useState([]);
@@ -99,39 +105,73 @@ export default function Accueil() {
 
   return (
     <main>
-      <section className="border-b border-line bg-glow">
-        <div className="mx-auto max-w-6xl px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-16">
-          <p className="inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-success shadow-card">
-            <CheckIcon className="h-3 w-3" /> Bourses, stages et opportunités vérifiés
-          </p>
-          <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-6xl">
-            Chaque opportunité mérite d'être <span className="text-accent-dark">trouvée</span>.
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-muted">
-            Nous recensons et expliquons les bourses d'études, stages, emplois et concours destinés aux jeunes
-            africains. Information vérifiée, critères clairs, lien direct vers la plateforme officielle.
-          </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <Link
-              to="/opportunites"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-primary-dark"
+      <section className="relative overflow-hidden border-b border-line bg-glow">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-16 lg:grid-cols-[1.15fr_1fr]">
+          <div>
+            <p className="animate-fade-up inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-success shadow-card">
+              <CheckIcon className="h-3 w-3" /> Bourses, stages et opportunités vérifiés
+            </p>
+            <h1
+              className="animate-fade-up mt-4 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-6xl"
+              style={{ "--delay": "100ms" }}
             >
-              Explorer les opportunités <ChevronRightIcon className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/ressources"
-              className="inline-flex items-center justify-center rounded-xl border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink shadow-card transition hover:border-primary"
-            >
-              Comment candidater
-            </Link>
+              Chaque opportunité mérite d'être <span className="text-accent-dark">trouvée</span>.
+            </h1>
+            <p className="animate-fade-up mt-4 max-w-xl text-lg text-muted" style={{ "--delay": "200ms" }}>
+              Nous recensons et expliquons les bourses d'études, stages, emplois et concours destinés aux jeunes
+              africains. Information vérifiée, critères clairs, lien direct vers la plateforme officielle.
+            </p>
+            <div className="animate-fade-up mt-7 flex flex-col gap-3 sm:flex-row" style={{ "--delay": "300ms" }}>
+              <Link
+                to="/opportunites"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-primary-dark hover:shadow-card-hover"
+              >
+                Explorer les opportunités
+                <ChevronRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link
+                to="/ressources"
+                className="inline-flex items-center justify-center rounded-xl border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink shadow-card transition hover:border-primary"
+              >
+                Comment candidater
+              </Link>
+            </div>
+
+            {stats && (
+              <div className="animate-fade-up mt-12 grid grid-cols-2 gap-6 border-t border-line pt-8 sm:max-w-md" style={{ "--delay": "400ms" }}>
+                <Statistique valeur={stats.total} libelle="opportunités vérifiées et ouvertes" />
+                <Statistique valeur={stats.organismes} libelle="organismes partenaires" />
+              </div>
+            )}
           </div>
 
-          {stats && (
-            <div className="mt-12 grid grid-cols-2 gap-6 border-t border-line pt-8 sm:max-w-xl">
-              <Statistique valeur={stats.total} libelle="opportunités vérifiées et ouvertes" />
-              <Statistique valeur={stats.organismes} libelle="organismes partenaires" />
+          <div className="animate-fade-up relative mx-auto w-full max-w-md lg:max-w-none" style={{ "--delay": "250ms" }} aria-hidden="true">
+            <div className="overflow-hidden rounded-[28px] shadow-card-hover">
+              <img
+                src="/images/accompagnement.jpg"
+                alt=""
+                width="1000"
+                height="667"
+                fetchPriority="high"
+                className="aspect-[4/3] w-full object-cover"
+              />
             </div>
-          )}
+            <div className="animate-float absolute -bottom-6 -left-4 hidden w-44 overflow-hidden rounded-2xl border-4 border-canvas shadow-card-hover sm:block">
+              <img src="/images/campus.jpg" alt="" width="1000" height="563" loading="lazy" className="aspect-[16/10] w-full object-cover" />
+            </div>
+            <div
+              className="animate-pop-in absolute right-2 top-6 flex items-center gap-2 rounded-xl bg-surface px-3 py-2 shadow-card-hover sm:-right-4"
+              style={{ "--delay": "700ms" }}
+            >
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-success-bg text-success">
+                <CheckIcon className="h-4 w-4" />
+              </span>
+              <span className="text-xs font-semibold text-ink">
+                Source officielle
+                <span className="block font-normal text-muted">vérifiée par l'équipe</span>
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -142,22 +182,37 @@ export default function Accueil() {
           texte="Cinq grandes catégories, mises à jour et vérifiées par l'équipe."
         />
         <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CATEGORIES.map((c) => {
+          {CATEGORIES.map((c, i) => {
             const nombre = stats?.parType?.[c.type] ?? 0;
             return (
-              <Link
-                key={c.type}
-                to={`/opportunites?type=${c.type}`}
-                className="group relative overflow-hidden rounded-card border border-line bg-surface p-5 pl-6 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-card-hover"
-              >
-                <span className={`absolute inset-y-0 left-0 w-1 ${TYPE_STYLES[c.type].bar}`} aria-hidden="true" />
-                <p className="font-display text-3xl font-semibold text-primary">{nombre}</p>
-                <h3 className="mt-1 font-display text-lg font-semibold text-ink">{c.titre}</h3>
-                <p className="mt-1 text-sm text-muted">{c.texte}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
-                  Voir les opportunités <ChevronRightIcon className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
-                </span>
-              </Link>
+              <Reveal key={c.type} delay={i * 80}>
+                <Link
+                  to={`/opportunites?type=${c.type}`}
+                  className="group relative block h-full overflow-hidden rounded-card border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+                >
+                  <div className="relative aspect-[16/9] overflow-hidden bg-primary-light">
+                    <img
+                      src={TYPE_IMAGES[c.type]}
+                      alt=""
+                      loading="lazy"
+                      width="1000"
+                      height="563"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/70 via-primary-dark/10 to-transparent" />
+                    <p className="absolute bottom-3 left-4 font-display text-4xl font-semibold text-white">{nombre}</p>
+                    <span className={`absolute inset-x-0 bottom-0 h-1 ${TYPE_STYLES[c.type].bar}`} aria-hidden="true" />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-display text-lg font-semibold text-ink">{c.titre}</h3>
+                    <p className="mt-1 text-sm text-muted">{c.texte}</p>
+                    <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
+                      Voir les opportunités{" "}
+                      <ChevronRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
             );
           })}
         </div>
@@ -177,8 +232,10 @@ export default function Accueil() {
               </Link>
             </div>
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {aLaUne.map((opp) => (
-                <OpportuniteCard key={opp.id} opportunite={opp} />
+              {aLaUne.map((opp, i) => (
+                <Reveal key={opp.id} delay={i * 90}>
+                  <OpportuniteCard opportunite={opp} />
+                </Reveal>
               ))}
             </div>
           </div>
@@ -193,11 +250,13 @@ export default function Accueil() {
         />
         <ol className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {ETAPES.map((e, i) => (
-            <li key={e.titre} className="rounded-card border border-line bg-surface p-4 shadow-card">
-              <span className="font-display text-3xl font-semibold text-accent">{String(i + 1).padStart(2, "0")}</span>
-              <h3 className="mt-1 font-display text-lg font-semibold text-ink">{e.titre}</h3>
-              <p className="mt-1 text-sm text-muted">{e.texte}</p>
-            </li>
+            <Reveal as="li" key={e.titre} delay={i * 90}>
+              <div className="h-full rounded-card border border-line bg-surface p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
+                <span className="font-display text-3xl font-semibold text-accent">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-1 font-display text-lg font-semibold text-ink">{e.titre}</h3>
+                <p className="mt-1 text-sm text-muted">{e.texte}</p>
+              </div>
+            </Reveal>
           ))}
         </ol>
       </section>
@@ -210,14 +269,16 @@ export default function Accueil() {
             texte="Savoir qu'une bourse existe ne suffit pas : il faut savoir qui peut postuler, quoi fournir et quand."
           />
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-            {ARGUMENTS.map((a) => (
-              <div key={a.titre} className="rounded-card border border-line bg-canvas p-5">
-                <h3 className="font-display text-xl font-semibold text-ink">{a.titre}</h3>
-                <p className="mt-2 text-sm text-muted">{a.texte}</p>
-              </div>
+            {ARGUMENTS.map((a, i) => (
+              <Reveal key={a.titre} delay={i * 100}>
+                <div className="h-full rounded-card border border-line bg-canvas p-5">
+                  <h3 className="font-display text-xl font-semibold text-ink">{a.titre}</h3>
+                  <p className="mt-2 text-sm text-muted">{a.texte}</p>
+                </div>
+              </Reveal>
             ))}
           </div>
-          <div className="mt-6 rounded-card bg-primary p-5 text-white sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <Reveal className="mt-6 rounded-card bg-primary p-5 text-white sm:flex sm:items-center sm:justify-between sm:gap-6">
             <div>
               <p className="font-display text-xl font-semibold">Une recherche qui comprend votre situation</p>
               <p className="mt-1 text-sm text-white/80">
@@ -231,7 +292,7 @@ export default function Accueil() {
             >
               Essayer la recherche intelligente
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
@@ -239,9 +300,12 @@ export default function Accueil() {
         <section className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
           <SectionTitre surtitre="Témoignages" titre="Ils ont trouvé leur opportunité" />
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-            {temoignages.map((t) => (
-              <figure key={t.id} className="rounded-card border border-line bg-surface p-6 shadow-card">
-                <blockquote className="font-display text-lg leading-relaxed text-ink">« {t.texte} »</blockquote>
+            {temoignages.map((t, i) => (
+              <Reveal as="figure" key={t.id} delay={i * 100} className="rounded-card border border-line bg-surface p-6 shadow-card">
+                <span className="font-display text-5xl leading-none text-accent" aria-hidden="true">
+                  “
+                </span>
+                <blockquote className="-mt-2 font-display text-lg leading-relaxed text-ink">{t.texte}</blockquote>
                 <figcaption className="mt-4 text-sm">
                   <span className="font-semibold text-ink">{t.nom}</span>
                   <span className="text-muted">
@@ -249,7 +313,7 @@ export default function Accueil() {
                     · {t.pays} · {t.parcours}, boursier {t.annee}
                   </span>
                 </figcaption>
-              </figure>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -263,7 +327,7 @@ export default function Accueil() {
               titre="Tout ce que vous voulez savoir"
               texte="Une question qui n'est pas listée ? Posez-la à l'équipe."
             />
-            <div className="mt-6 divide-y divide-line border-y border-line">
+            <Reveal className="mt-6 divide-y divide-line border-y border-line">
               {faq.map((item) => {
                 const ouverte = faqOuverte === item.id;
                 return (
@@ -275,14 +339,21 @@ export default function Accueil() {
                     >
                       <span>{item.question}</span>
                       <ChevronDownIcon
-                        className={`h-4 w-4 shrink-0 text-accent transition-transform ${ouverte ? "rotate-180" : ""}`}
+                        className={`h-4 w-4 shrink-0 text-accent transition-transform duration-300 ${ouverte ? "rotate-180" : ""}`}
                       />
                     </button>
-                    {ouverte && <p className="pb-4 text-sm text-muted">{item.reponse}</p>}
+                    {/* grid 0fr -> 1fr : ouverture fluide sans connaître la hauteur du texte */}
+                    <div
+                      className={`grid transition-all duration-300 ease-out ${ouverte ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+                    >
+                      <p className="overflow-hidden text-sm text-muted">
+                        <span className="block pb-4">{item.reponse}</span>
+                      </p>
+                    </div>
                   </div>
                 );
               })}
-            </div>
+            </Reveal>
             <Link to="/aide" className="mt-5 inline-block text-sm font-semibold text-primary hover:underline">
               Voir toute la FAQ et poser une question →
             </Link>
