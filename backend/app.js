@@ -57,7 +57,7 @@ function createApp({ pool, sessionStore }) {
   app.use(createOriginGuard(allowedOrigin));
   app.use(
     "/api",
-    createRateLimiter({ windowMs: 60 * 1000, max: 300, message: "Trop de requêtes, réessayez dans une minute." }),
+    createRateLimiter({ windowMs: 60 * 1000, max: 900, message: "Trop de requêtes, réessayez dans une minute." }),
   );
 
   // Session pour l'espace équipe (Ressources/Aide). Stockée en base (sessionStore) en

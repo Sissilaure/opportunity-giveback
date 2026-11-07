@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
-import bcrypt from "bcryptjs";
+import { hashMotDePasse } from "../motDePasse";
 import createApp from "../app";
 import { construireNotifications } from "../compteRoutes";
 
@@ -9,7 +9,7 @@ let n = 0;
 // Chaque test utilise sa propre application et une adresse IP distincte : les limiteurs de débit sont par instance/IP.
 const nouvelleApp = () => createApp({ pool });
 const ip = () => `10.20.30.${++n}`;
-const HASH = bcrypt.hashSync("une-phrase-de-passe-solide", 4);
+const HASH = await hashMotDePasse("une-phrase-de-passe-solide");
 
 beforeEach(() => pool.query.mockReset());
 
@@ -35,7 +35,7 @@ describe("POST /api/compte/inscription", () => {
     const [sql, params] = pool.query.mock.calls[0];
     expect(sql).toMatch(/INSERT INTO utilisateur/);
     expect(params[0]).toBe("awa@exemple.org");
-    expect(params[1]).toMatch(/^\$2[aby]\$12\$/); // bcrypt coût 12
+    expect(params[1]).toMatch(/^scrypt\$16384\$8\$5\$/); // scrypt, jamais le mot de passe en clair
     expect(params[1]).not.toContain("solide");
   });
 
@@ -63,16 +63,17 @@ describe("POST /api/compte/inscription", () => {
     expect(res.body.error).toMatch(/existe déjà/);
   });
 
-  it("limite les créations de compte par adresse IP (8 par heure)", async () => {
+  it("limite les créations de compte par adresse IP (40 par heure : un campus partage une adresse)", async () => {
     const app = nouvelleApp();
     const adresse = ip();
     const statuts = [];
-    for (let i = 0; i < 9; i++) {
+    for (let i = 0; i < 41; i++) {
       // Mot de passe trop court : refusé avant toute écriture, mais chaque tentative compte dans la limite.
       const r = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", adresse).send({ email: `u${i}@b.org`, motDePasse: "court" });
       statuts.push(r.status);
     }
-    expect(statuts).toEqual([400, 400, 400, 400, 400, 400, 400, 400, 429]);
+    expect(statuts.slice(0, 40).every((s) => s === 400)).toBe(true);
+    expect(statuts[40]).toBe(429);
     expect(pool.query).not.toHaveBeenCalled();
   });
 });

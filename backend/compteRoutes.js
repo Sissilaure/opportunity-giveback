@@ -2,8 +2,8 @@
 // Aucune adresse email n'est utilisée pour envoyer quoi que ce soit : les rappels s'affichent dans l'appli
 // (cloche), calculés à la demande à partir des échéances des opportunités suivies. Pas de tâche planifiée à maintenir.
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const { z } = require("zod");
+const { hashMotDePasse, verifierMotDePasse, hashFactice } = require("./motDePasse");
 const createRateLimiter = require("./rateLimit");
 const validate = require("./validate");
 const { AppError, asyncHandler } = require("./errors");
@@ -45,16 +45,14 @@ const importSchema = z.object({ ids: z.array(idOpportunite).max(100, "Trop d'él
 const luesSchema = z.object({ cles: z.array(z.string().trim().min(1).max(80)).max(100) });
 const suppressionSchema = z.object({ motDePasse: z.string().min(1, "Mot de passe requis.").max(200) });
 
-const DUMMY_HASH = bcrypt.hashSync("mot-de-passe-inexistant", 12);
-
 const inscriptionLimiter = createRateLimiter({
   windowMs: 60 * 60 * 1000,
-  max: 8,
+  max: 40, // un amphithéâtre entier peut s'inscrire depuis le wifi du campus (une seule adresse IP)
   message: "Trop de créations de compte depuis cette connexion, réessayez plus tard.",
 });
 const connexionLimiter = createRateLimiter({
   windowMs: 15 * 60 * 1000,
-  max: 15,
+  max: 80, // le verrou par compte (8 essais) protège les comptes ; celui-ci évite seulement l'abus massif
   message: "Trop de tentatives de connexion, réessayez dans quelques minutes.",
 });
 const connexionCompteLimiter = createRateLimiter({
@@ -141,7 +139,7 @@ function createCompteRouter(pool) {
       if (MOTS_DE_PASSE_FAIBLES.has(mdp.toLowerCase()) || mdp.toLowerCase() === email || /^(.)\1+$/.test(mdp)) {
         throw new AppError(400, "Ce mot de passe est trop facile à deviner, choisissez-en un autre.");
       }
-      const hash = await bcrypt.hash(mdp, 12);
+      const hash = await hashMotDePasse(mdp);
       let insertId;
       try {
         const [result] = await pool.query("INSERT INTO utilisateur (email, password_hash, prenom) VALUES (?, ?, ?)", [
@@ -172,7 +170,7 @@ function createCompteRouter(pool) {
       const [rows] = await pool.query("SELECT id, email, prenom, password_hash FROM utilisateur WHERE email = ?", [email]);
       const user = rows[0];
       // Comparaison faite même si le compte n'existe pas : même durée de réponse (pas de fuite par le temps).
-      const valide = await bcrypt.compare(mdp, user ? user.password_hash : DUMMY_HASH);
+      const valide = await verifierMotDePasse(mdp, user ? user.password_hash : await hashFactice());
       if (!user || !valide) throw new AppError(401, "Email ou mot de passe incorrect.");
       await ouvrirSession(req, user);
       res.json({ utilisateur: publicUser(user) });
@@ -204,7 +202,7 @@ function createCompteRouter(pool) {
     validate(suppressionSchema),
     asyncHandler(async (req, res) => {
       const [rows] = await pool.query("SELECT password_hash FROM utilisateur WHERE id = ?", [req.session.userId]);
-      const valide = await bcrypt.compare(req.body.motDePasse, rows[0] ? rows[0].password_hash : DUMMY_HASH);
+      const valide = await verifierMotDePasse(req.body.motDePasse, rows[0] ? rows[0].password_hash : await hashFactice());
       if (!rows[0] || !valide) throw new AppError(401, "Mot de passe incorrect.");
       const id = req.session.userId;
       await pool.query("DELETE FROM suivi_candidature WHERE id_utilisateur = ?", [id]);
