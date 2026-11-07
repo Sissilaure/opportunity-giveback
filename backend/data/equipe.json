@@ -34,5 +34,11 @@
     "nom": "D'aisth Ondongo",
     "role": "Pôle veille et recherche d'informations",
     "description": "Chargée de la recherche des opportunités."
+  },
+  {
+    "id": "eq-7",
+    "nom": "Sylviane Yameogo",
+    "role": "Développement de l'application",
+    "description": "Conçoit et développe la plateforme Opportunity Hub."
   }
 ]
