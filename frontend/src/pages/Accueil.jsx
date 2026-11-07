@@ -159,16 +159,17 @@ export default function Accueil() {
           titre="Trouvez ce qui correspond à votre parcours"
           texte="Cinq grandes catégories, mises à jour et vérifiées par l'équipe."
         />
-        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {/* 5 catégories : 3 + 2 sur 6 colonnes, pour que la 2e rangée remplisse la largeur au lieu de laisser un trou. */}
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
           {CATEGORIES.map((c, i) => {
             const nombre = stats?.parType?.[c.type] ?? 0;
             return (
-              <Reveal key={c.type} delay={i * 80}>
+              <Reveal key={c.type} delay={i * 80} className={i < 3 ? "lg:col-span-2" : "lg:col-span-3"}>
                 <Link
                   to={`/opportunites?type=${c.type}`}
                   className="group relative block h-full overflow-hidden rounded-card border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
                 >
-                  <div className="relative aspect-[16/9] overflow-hidden bg-primary-light">
+                  <div className={`photo-chaude relative overflow-hidden bg-primary-light ${i < 3 ? "aspect-[16/9]" : "aspect-[16/9] lg:aspect-[16/6]"}`}>
                     <img
                       src={TYPE_IMAGES[c.type]}
                       alt=""

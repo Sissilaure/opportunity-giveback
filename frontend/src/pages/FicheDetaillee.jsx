@@ -115,7 +115,7 @@ export default function FicheDetaillee() {
         <ChevronLeftIcon className="h-4 w-4" /> Opportunités
       </Link>
 
-      <div className="animate-fade-up relative mt-4 aspect-[21/9] overflow-hidden rounded-card bg-primary-light shadow-card">
+      <div className="photo-chaude animate-fade-up relative mt-4 aspect-[21/9] overflow-hidden rounded-card bg-primary-light shadow-card">
         <img
           src={imageOpportunite(opp)}
           alt=""

@@ -20,6 +20,13 @@ class MySQLSessionStore extends session.Store {
     `);
   }
 
+  // Les sessions expirées ne sont jamais relues mais restaient en base : on les supprime (appelé chaque jour).
+  async purge() {
+    await this.pret;
+    const [result] = await this.pool.query("DELETE FROM sessions WHERE expires_at < NOW()");
+    return result.affectedRows;
+  }
+
   async get(sid, callback) {
     try {
       await this.pret;

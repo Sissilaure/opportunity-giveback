@@ -13,7 +13,14 @@ async function main() {
     return;
   }
 
-  const passwordHash = await bcrypt.hash(motDePasse, 10);
+  if (motDePasse.length < 12) {
+    console.error("Mot de passe trop court : 12 caractères minimum (une phrase de passe fait très bien l'affaire).");
+    process.exitCode = 1;
+    await pool.end();
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(motDePasse, 12);
 
   await pool.query(
     `INSERT INTO admin_user (email, password_hash) VALUES (?, ?)

@@ -28,6 +28,13 @@ async function cycleAutomatique() {
   }
 
   try {
+    const purgees = await sessionStore.purge();
+    if (purgees) console.log(`${purgees} session(s) expirée(s) supprimée(s).`);
+  } catch (err) {
+    console.error("Erreur purge des sessions:", err);
+  }
+
+  try {
     const archivees = await marquerExpirees(pool, 20);
     if (archivees) {
       console.log(`${archivees} opportunité(s) expirée(s) depuis plus de 20 jours ont été archivées.`);

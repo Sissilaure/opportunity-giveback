@@ -101,7 +101,10 @@ async function initializeAdminTable() {
   // Premier démarrage sans compte : si ADMIN_EMAIL/ADMIN_PASSWORD sont fournis, on crée
   // le premier compte automatiquement. Ensuite, ADMIN_PASSWORD n'est plus utilisé pour l'auth.
   if (total === 0 && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
-    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+    if (process.env.ADMIN_PASSWORD.length < 12) {
+      console.warn("ADMIN_PASSWORD fait moins de 12 caractères : changez-le dès la première connexion (node scripts/createAdmin.js).");
+    }
+    const passwordHash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 12);
     await pool.query("INSERT INTO admin_user (email, password_hash) VALUES (?, ?)", [
       process.env.ADMIN_EMAIL.trim().toLowerCase(),
       passwordHash,

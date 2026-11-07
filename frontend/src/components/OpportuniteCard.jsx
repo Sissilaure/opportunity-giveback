@@ -11,7 +11,7 @@ export default function OpportuniteCard({ opportunite }) {
       to={`/opportunites/${opportunite.id}`}
       className="group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
     >
-      <div className="relative aspect-[16/9] overflow-hidden bg-primary-light">
+      <div className="photo-chaude relative aspect-[16/9] overflow-hidden bg-primary-light">
         <img
           src={imageOpportunite(opportunite)}
           alt=""

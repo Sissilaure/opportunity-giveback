@@ -19,8 +19,8 @@ const opportunitesQuerySchema = z.object({
 });
 
 const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().min(1, "Email requis."),
-  motDePasse: z.string().min(1, "Mot de passe requis."),
+  email: z.string().trim().toLowerCase().min(1, "Email requis.").max(255, "Email trop long."),
+  motDePasse: z.string().min(1, "Mot de passe requis.").max(200, "Mot de passe trop long."),
 });
 
 const questionSchema = z.object({

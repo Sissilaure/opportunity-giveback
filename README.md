@@ -187,7 +187,12 @@ Mesures en place (et testées dans `backend/tests/api.test.js`) :
   newsletter et les appels à l'IA ; corps JSON limité à 20 Ko.
 - **IA** : sa sortie est traitée comme une entrée non fiable (liens vérifiés, longueurs bornées). Les messages
   publics ne révèlent jamais la configuration (ex. clé absente).
-- **Dépendances** : `npm audit --omit=dev` ne signale plus que `zod` (alerte sur de très grosses collections,
+- **Connexion équipe** : verrou par IP (10 essais / 15 min) **et** par compte (8 essais / 15 min), comparaison de
+  mot de passe à temps constant (compte inconnu inclus), bcrypt coût 12, mot de passe d'au moins 12 caractères via
+  `scripts/createAdmin.js`, `SESSION_SECRET` de 32 caractères minimum en production, sessions expirées purgées chaque jour.
+- **Origine autorisée** : `FRONTEND_URL` est normalisé (un `/` final ou des majuscules ne bloquent plus les formulaires).
+- **Recherche** : les jokers SQL `%` et `_` saisis par le visiteur sont neutralisés.
+- **Dépendances** : `npm audit` : frontend sans alerte ; backend : seul `zod` (alerte sur de très grosses collections,
   non applicable ici) ; sa mise à jour en v4 est un changement majeur à faire à part.
 
 ## Design et animations

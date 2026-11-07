@@ -446,4 +446,57 @@ describe("Sécurité", () => {
       expect(r.body.error).not.toMatch(/Invalid|Required|String must|Number must|Expected/);
     }
   });
+
+  it("accepte une écriture même si FRONTEND_URL est écrit avec un / final ou des majuscules", async () => {
+    const ancien = process.env.FRONTEND_URL;
+    process.env.FRONTEND_URL = "HTTPS://Mon-Site.vercel.app/";
+    const appSlash = createApp({ pool });
+    process.env.FRONTEND_URL = ancien;
+    pool.query.mockResolvedValueOnce([{ affectedRows: 1 }, []]);
+    const res = await request(appSlash).post("/api/newsletter").set("X-Forwarded-For", "10.9.9.1").set("Origin", "https://mon-site.vercel.app").send({ email: "a@b.org" });
+    expect(res.status).toBe(201);
+    const refus = await request(appSlash).post("/api/newsletter").set("X-Forwarded-For", "10.9.9.2").set("Origin", "https://mon-site.vercel.app.evil.com").send({ email: "a@b.org" });
+    expect(refus.status).toBe(403);
+  });
+
+  it("refuse de démarrer en production avec un SESSION_SECRET trop court", () => {
+    const env = { ...process.env };
+    process.env.NODE_ENV = "production";
+    process.env.SESSION_SECRET = "court";
+    expect(() => createApp({ pool })).toThrow(/trop court/);
+    process.env.SESSION_SECRET = "x".repeat(40);
+    expect(() => createApp({ pool })).not.toThrow();
+    process.env.NODE_ENV = env.NODE_ENV;
+    if (env.SESSION_SECRET === undefined) delete process.env.SESSION_SECRET;
+    else process.env.SESSION_SECRET = env.SESSION_SECRET;
+  });
+
+  it("neutralise les jokers SQL (% et _) saisis dans la recherche", async () => {
+    pool.query.mockResolvedValue([[], []]);
+    await request(app).get("/api/opportunites").query({ q: "100%_bourse" });
+    const appel = pool.query.mock.calls.find(([sql]) => String(sql).includes("LIKE"));
+    expect(appel[1][0]).toBe("%100\\%\\_bourse%");
+  });
+
+  it("verrouille un compte ciblé par trop d'essais, même si l'attaquant change d'IP", async () => {
+    pool.query.mockResolvedValue([[], []]);
+    const appCompte = createApp({ pool });
+    let dernier;
+    for (let i = 0; i < 9; i++) {
+      dernier = await request(appCompte)
+        .post("/api/admin/login")
+        .set("X-Forwarded-For", `10.0.0.${i + 1}`)
+        .send({ email: "cible@test.org", motDePasse: "essai" + i });
+    }
+    expect(dernier.status).toBe(429);
+    expect(dernier.body.error).toMatch(/ce compte/);
+  });
+
+  it("n'inclut pas les opportunités échues dans les statistiques d'accueil", async () => {
+    pool.query.mockResolvedValue([[], []]);
+    await request(app).get("/api/stats");
+    const sqls = pool.query.mock.calls.map(([sql]) => String(sql));
+    expect(sqls.filter((s) => s.includes("COUNT"))).toHaveLength(2);
+    expect(sqls.every((s) => !s.includes("COUNT") || s.includes("CURDATE()"))).toBe(true);
+  });
 });

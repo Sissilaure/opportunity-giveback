@@ -1,10 +1,10 @@
 // Limiteur de débit en mémoire, sans dépendance externe.
 // Suffisant pour une seule instance ; à remplacer par un store partagé (Redis) si l'app est répliquée.
-function createRateLimiter({ windowMs, max, message }) {
+function createRateLimiter({ windowMs, max, message, key: cleDe = (req) => req.ip }) {
   const hits = new Map();
 
   return function rateLimiter(req, res, next) {
-    const key = req.ip;
+    const key = cleDe(req);
     const now = Date.now();
 
     // Sans nettoyage, chaque IP vue resterait en mémoire pour toujours.

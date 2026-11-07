@@ -6,7 +6,8 @@
     "dev": "nodemon index.js",
     "start": "node index.js",
     "test": "vitest run",
-    "create-admin": "node scripts/createAdmin.js"
+    "create-admin": "node scripts/createAdmin.js",
+    "verifier": "node scripts/verifierLecture.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

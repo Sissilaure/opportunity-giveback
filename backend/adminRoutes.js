@@ -16,6 +16,15 @@ const loginLimiter = createRateLimiter({
   message: "Trop de tentatives de connexion, réessayez dans quelques minutes.",
 });
 
+// Verrou par compte, en plus du verrou par IP : sans lui, quelqu'un qui change d'adresse IP peut essayer
+// des mots de passe à l'infini sur le compte d'un membre de l'équipe.
+const loginCompteLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  message: "Trop de tentatives sur ce compte, réessayez dans quelques minutes.",
+  key: (req) => `compte:${String(req.body?.email || "").trim().toLowerCase().slice(0, 255)}`,
+});
+
 // `pool` est injecté (plutôt qu'importé directement) pour pouvoir brancher un pool
 // factice dans les tests sans dépendre d'un vrai serveur MySQL.
 function createAdminRouter(pool) {
@@ -25,6 +34,7 @@ function createAdminRouter(pool) {
     "/login",
     loginLimiter,
     validate(loginSchema),
+    loginCompteLimiter,
     asyncHandler(async (req, res) => {
       const { email, motDePasse } = req.body;
 
@@ -36,6 +46,8 @@ function createAdminRouter(pool) {
 
       const valid = await bcrypt.compare(motDePasse, user ? user.password_hash : DUMMY_HASH);
       if (!user || !valid) {
+        // Trace côté serveur (journaux Render) pour repérer une attaque ; jamais le mot de passe.
+        console.warn(`Connexion refusée depuis ${req.ip}`);
         throw new AppError(401, "Identifiants incorrects.");
       }
 
@@ -50,7 +62,9 @@ function createAdminRouter(pool) {
 
   router.post("/logout", (req, res) => {
     req.session.destroy(() => {
-      res.clearCookie("connect.sid");
+      // Mêmes attributs que le cookie posé à la connexion, sinon le navigateur ne le supprime pas (SameSite=None + Secure en prod).
+      const prod = process.env.NODE_ENV === "production";
+      res.clearCookie("connect.sid", { httpOnly: true, sameSite: prod ? "none" : "lax", secure: prod });
       res.json({ message: "Déconnecté." });
     });
   });

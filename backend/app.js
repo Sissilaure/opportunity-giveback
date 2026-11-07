@@ -6,7 +6,7 @@ const session = require("express-session");
 const { AppError, asyncHandler, errorHandler } = require("./errors");
 const validate = require("./validate");
 const createRateLimiter = require("./rateLimit");
-const { createOriginGuard } = require("./security");
+const { createOriginGuard, normalizeOrigin } = require("./security");
 const { opportunitesQuerySchema } = require("./schemas");
 const { formatOpportunite } = require("./opportunites");
 
@@ -30,7 +30,7 @@ function createApp({ pool, sessionStore }) {
   const isProd = process.env.NODE_ENV === "production";
 
   // "*" + credentials:true est rejeté par les navigateurs : en prod, FRONTEND_URL doit être défini.
-  const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+  const allowedOrigin = normalizeOrigin(process.env.FRONTEND_URL || "http://localhost:5173");
   if (!process.env.FRONTEND_URL && isProd) {
     console.warn(
       "FRONTEND_URL n'est pas défini : CORS est restreint à http://localhost:5173, ce qui bloquera le frontend en production."
@@ -40,6 +40,10 @@ function createApp({ pool, sessionStore }) {
   // Sans secret propre, les cookies de session seraient signés avec une valeur publique (visible dans le code).
   if (isProd && !process.env.SESSION_SECRET) {
     throw new Error("SESSION_SECRET est obligatoire en production.");
+  }
+  // Un secret court se devine par force brute : il signe le cookie de session de l'espace équipe.
+  if (isProd && process.env.SESSION_SECRET.length < 32) {
+    throw new Error("SESSION_SECRET est trop court (32 caractères minimum) : voir backend/.env.example.");
   }
 
   app.disable("x-powered-by");
@@ -100,8 +104,10 @@ function createApp({ pool, sessionStore }) {
       const params = [];
 
       if (q) {
+        // % et _ saisis par le visiteur sont des jokers SQL : on les neutralise pour chercher le texte tel quel.
+        const motif = `%${q.replace(/[\\%_]/g, "\\$&")}%`;
         whereSql += " AND (o.titre LIKE ? OR s.nom LIKE ?)";
-        params.push(`%${q}%`, `%${q}%`);
+        params.push(motif, motif);
       }
 
       if (type) {
@@ -168,10 +174,10 @@ function createApp({ pool, sessionStore }) {
     "/api/stats",
     asyncHandler(async (req, res) => {
       const [parType] = await pool.query(
-        "SELECT type, COUNT(*) AS total FROM opportunite WHERE statut = 'verifiee' GROUP BY type",
+        "SELECT type, COUNT(*) AS total FROM opportunite WHERE statut = 'verifiee' AND (date_echeance IS NULL OR date_echeance >= CURDATE()) GROUP BY type",
       );
       const [[{ organismes }]] = await pool.query(
-        "SELECT COUNT(DISTINCT id_structure) AS organismes FROM opportunite WHERE statut = 'verifiee'",
+        "SELECT COUNT(DISTINCT id_structure) AS organismes FROM opportunite WHERE statut = 'verifiee' AND (date_echeance IS NULL OR date_echeance >= CURDATE())",
       );
       const parTypeMap = Object.fromEntries(parType.map((r) => [r.type, Number(r.total)]));
       const total = Object.values(parTypeMap).reduce((a, b) => a + b, 0);
