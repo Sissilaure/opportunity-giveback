@@ -29,7 +29,7 @@ export default function RechercheIA() {
         saisieInvalide,
         message: saisieInvalide
           ? err.message
-          : "La recherche intelligente est momentanément indisponible. En attendant, utilisez la barre de recherche ou les filtres : toutes les opportunités vérifiées restent accessibles.",
+          : "La recherche intelligente est momentanément indisponible : réessayez dans quelques secondes. En attendant, utilisez la barre de recherche ou les filtres : toutes les opportunités vérifiées restent accessibles.",
       });
       setStatut("error");
     }
