@@ -10,11 +10,11 @@ export const TYPE_LABELS = {
 };
 
 export const TYPE_STYLES = {
-  bourse: { bar: "bg-primary", badge: "bg-primary-light text-primary" },
-  stage: { bar: "bg-accent", badge: "bg-accent-light text-accent" },
-  emploi: { bar: "bg-success", badge: "bg-success-bg text-success" },
-  concours: { bar: "bg-feature", badge: "bg-feature-bg text-feature" },
-  autre: { bar: "bg-muted", badge: "bg-canvas text-muted" },
+  bourse: { bar: "bg-primary", badge: "bg-accent text-ink" },
+  stage: { bar: "bg-accent", badge: "bg-accent text-ink" },
+  emploi: { bar: "bg-success", badge: "bg-accent text-ink" },
+  concours: { bar: "bg-ink", badge: "bg-accent text-ink" },
+  autre: { bar: "bg-muted", badge: "bg-accent text-ink" },
 };
 
 // Visuel par catégorie (photos libres de droits Pexels, hébergées dans /public/images).

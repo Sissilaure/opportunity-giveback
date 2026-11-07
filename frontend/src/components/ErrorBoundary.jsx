@@ -17,7 +17,7 @@ export default class ErrorBoundary extends Component {
     if (!this.state.erreur) return this.props.children;
     return (
       <main role="alert" className="mx-auto flex min-h-[60vh] max-w-lg flex-col items-center justify-center px-5 text-center">
-        <p className="font-display text-3xl font-semibold text-ink">Un problème est survenu</p>
+        <p className="font-serif text-3xl text-ink">Un problème est survenu</p>
         <p className="mt-2 text-base text-muted">
           Cette page n'a pas pu s'afficher. Rechargez-la ou revenez à l'accueil, vos opportunités suivies sont conservées.
         </p>
@@ -28,7 +28,7 @@ export default class ErrorBoundary extends Component {
           >
             Recharger la page
           </button>
-          <a href="/" className="rounded-xl border border-line bg-surface px-5 py-3 text-sm font-semibold text-ink hover:border-primary">
+          <a href="/" className="rounded-xl border border-ink/40 bg-transparent px-5 py-3 text-sm font-semibold text-ink hover:border-ink">
             Retour à l'accueil
           </a>
         </div>

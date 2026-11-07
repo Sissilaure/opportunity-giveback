@@ -52,7 +52,7 @@ export default function RessourceDetail() {
             <span className="inline-block rounded bg-canvas px-2 py-0.5 text-xs font-semibold tracking-wide text-ink">
               {LABELS[ressource.type] || ressource.type}
             </span>
-            <h1 className="mt-2 font-display text-2xl font-semibold leading-snug text-ink">{ressource.titre}</h1>
+            <h1 className="mt-2 font-display text-2xl leading-snug text-ink">{ressource.titre}</h1>
             <p className="mt-1 text-sm text-muted">{ressource.description}</p>
           </div>
 

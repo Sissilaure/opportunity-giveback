@@ -28,7 +28,7 @@ export default function Suivi() {
   return (
     <main className="mx-auto max-w-6xl px-5 pb-14 pt-6 sm:px-8 sm:pt-10">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Mon suivi</p>
-      <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+      <h1 className="mt-1 font-display text-4xl tracking-tight text-ink sm:text-5xl">
         Mes opportunités
       </h1>
       <p className="mt-2 max-w-2xl text-base text-muted">
@@ -46,7 +46,7 @@ export default function Suivi() {
 
       {!chargement && opportunites.length === 0 && (
         <div className="animate-fade-up mt-10 rounded-card border border-dashed border-line bg-surface p-10 text-center">
-          <p className="font-display text-xl font-semibold text-ink">Rien dans votre suivi pour l'instant</p>
+          <p className="font-serif text-2xl text-ink">Rien dans votre suivi pour l'instant</p>
           <p className="mt-1 text-sm text-muted">
             Ouvrez une opportunité et utilisez « Ajouter à mon suivi » pour la retrouver ici.
           </p>

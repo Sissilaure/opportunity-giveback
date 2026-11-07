@@ -27,8 +27,8 @@ export default function Ressources() {
   return (
     <main className="mx-auto max-w-6xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Ressources</p>
-      <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">Ressources</h1>
-      <p className="mt-1 text-base italic text-muted">Guides, modèles et réponses</p>
+      <h1 className="mt-1 font-display text-4xl tracking-tight text-ink sm:text-5xl">Ressources</h1>
+      <p className="mt-1 font-serif text-xl italic text-muted">Guides, modèles et réponses</p>
 
       {chargement && <p className="mt-6 text-sm text-muted">Chargement…</p>}
       {erreur && <p className="mt-6 text-sm text-danger">{erreur}</p>}
@@ -53,9 +53,9 @@ export default function Ressources() {
                 <span className="inline-block w-fit rounded bg-canvas px-2 py-0.5 text-xs font-semibold tracking-wide text-ink">
                   {LABELS[r.type] || r.type}
                 </span>
-                <h3 className="mt-2 font-display text-lg font-bold leading-snug text-ink">{r.titre}</h3>
+                <h3 className="mt-2 font-display text-lg leading-snug text-ink">{r.titre}</h3>
                 <p className="mt-1 text-sm text-muted">{r.description}</p>
-                <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-primary-light px-3 py-1 text-xs font-semibold text-primary transition group-hover:bg-primary group-hover:text-white">
+                <span className="mt-3 inline-flex w-fit items-center gap-1 rounded-md bg-primary-light px-3 py-1 text-xs font-semibold text-primary transition group-hover:bg-primary group-hover:text-white">
                   Consulter le guide
                   <ChevronRightIcon className="h-3.5 w-3.5" />
                 </span>

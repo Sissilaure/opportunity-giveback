@@ -1,42 +1,40 @@
 /** @type {import('tailwindcss').Config} */
+// Charte Yeelen : tout ce qui touche aux couleurs, polices, arrondis et ombres se règle ICI (et dans index.css pour les variables).
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        // Charte visuelle commune (reprise du site du groupe 1) : fond crème, bleu nuit, or, vert profond.
-        canvas: "#FAF9F6",
-        surface: "#FFFFFF",
-        ink: "#10151F",
-        muted: "#575B63",
-        line: "#E6E3DD",
-        // Bleu marine et or : repris directement du logo, pour une identité cohérente.
-        primary: { DEFAULT: "#1B2A4A", dark: "#101B33", light: "#E8ECF3" },
-        accent: { DEFAULT: "#C9A25D", dark: "#9A7632", light: "#F6EFDF" },
-        success: { DEFAULT: "#2F5D50", bg: "#E6EFEC" },
-        danger: { DEFAULT: "#B3302B", bg: "#FBEAEA" },
-        // Violet réservé aux concours : différencie les catégories entre elles, sans virer à l'arc-en-ciel.
-        feature: { DEFAULT: "#6D4AA6", bg: "#F1ECFA" },
+        canvas: "#F4EFE6", // fond principal (crème chaud)
+        surface: "#EEEBE5", // cartes et champs
+        ink: "#191817", // texte principal
+        muted: "#6A6660", // texte secondaire (pierre)
+        line: "rgba(25, 24, 23, 0.13)", // bordures fines
+        white: "#F4EFE6", // « blanc » du site = crème (texte sur fond latérite ou encre)
+        // Latérite : boutons principaux, liens, états actifs.
+        primary: { DEFAULT: "#8F4E35", dark: "#74402B", light: "#E9DDD0" },
+        // Or d'aube : badges, surlignages, détails. Pour du texte sur fond clair, utiliser primary.
+        accent: { DEFAULT: "#D6B172", dark: "#8F4E35", light: "#EFE3C8" },
+        success: { DEFAULT: "#3F5B45", bg: "#E1E7DA" },
+        danger: { DEFAULT: "#A12B2B", bg: "#F2DEDA" },
         // Alias conservés pour compatibilité avec les usages existants.
-        cream: "#FAF9F6",
-        gold: "#C9A25D",
-        alert: { bg: "#FBEAEA", text: "#B3302B" },
-        verified: { bg: "#E6EFEC", text: "#2F5D50" },
+        cream: "#F4EFE6",
+        gold: "#D6B172",
+        alert: { bg: "#F2DEDA", text: "#A12B2B" },
+        verified: { bg: "#E1E7DA", text: "#3F5B45" },
       },
       fontFamily: {
-        display: ["Fraunces", "Georgia", "serif"],
-        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Italiana", "Georgia", "serif"], // titres
+        sans: ["Instrument Sans", "system-ui", "sans-serif"], // texte et interface
+        serif: ["Instrument Serif", "Georgia", "serif"], // citations, sous-titres, slogan (en italique)
       },
-      borderRadius: { card: "14px" },
+      borderRadius: { card: "10px", lg: "8px", xl: "10px", "2xl": "10px" },
       boxShadow: {
-        card: "0 1px 2px rgba(18,22,43,0.05), 0 1px 1px rgba(18,22,43,0.04)",
-        "card-hover": "0 16px 32px -14px rgba(18,22,43,0.28), 0 2px 6px rgba(18,22,43,0.06)",
-        header: "0 1px 0 rgba(18,22,43,0.06), 0 8px 24px -16px rgba(18,22,43,0.18)",
+        card: "none",
+        "card-hover": "0 8px 20px -14px rgba(25, 24, 23, 0.25)",
+        header: "0 1px 0 rgba(25, 24, 23, 0.10)",
       },
-      backgroundImage: {
-        glow:
-          "radial-gradient(680px circle at 12% -15%, rgba(27,42,74,0.10), transparent 55%), radial-gradient(520px circle at 92% -10%, rgba(201,162,93,0.16), transparent 50%)",
-      },
+      backgroundImage: { glow: "none" },
     },
   },
   plugins: [],

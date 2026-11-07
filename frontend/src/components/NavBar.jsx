@@ -34,25 +34,10 @@ export default function NavBar() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-10 border-b border-line bg-surface/90 backdrop-blur transition-shadow duration-300 ${defile ? "shadow-header" : ""}`}>
+    <header className={`sticky top-0 z-10 border-b border-line bg-canvas/95 backdrop-blur transition-shadow duration-300 ${defile ? "shadow-header" : ""}`}>
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-8 sm:py-4">
-        <Link to="/" aria-label="Accueil" onClick={fermerMenu} className="group flex items-center gap-2.5 sm:gap-3">
-          <img
-            src="/logo-96.png"
-            alt=""
-            width="44"
-            height="44"
-            className="h-9 w-9 shrink-0 rounded-full shadow-card transition-transform duration-300 ease-out group-hover:rotate-6 group-hover:scale-105 sm:h-11 sm:w-11"
-          />
-          <span className="font-display text-lg font-semibold tracking-tight sm:text-2xl">
-            <span className="text-ink">Opportunity</span>{" "}
-            <span
-              className="bg-[length:200%_auto] bg-gradient-to-r from-accent via-[#EAD08A] to-accent bg-clip-text text-transparent transition-[background-position] duration-700 ease-out group-hover:bg-[position:100%_0]"
-              style={{ backgroundPosition: "0% 0" }}
-            >
-              Hub
-            </span>
-          </span>
+        <Link to="/" aria-label="Yeelen, accueil" onClick={fermerMenu} className="group -my-1 flex items-center py-1.5">
+          <img src="/brand/logo-header.svg" alt="Yeelen" width="205" height="40" className="h-8 w-auto sm:h-10" />
         </Link>
 
         <nav className="hidden items-center gap-6 sm:flex">
@@ -91,7 +76,7 @@ export default function NavBar() {
       </div>
 
       {menuOuvert && (
-        <nav id="menu-mobile" aria-label="Menu principal" className="animate-fade-up border-t border-line bg-surface px-5 pb-4 pt-2 sm:hidden">
+        <nav id="menu-mobile" aria-label="Menu principal" className="animate-fade-up border-t border-line bg-canvas px-5 pb-4 pt-2 sm:hidden">
           <div className="flex flex-col">
             {LIENS.map((lien) => {
               const actif = estActif(location.pathname, lien.href);

@@ -5,8 +5,8 @@ export default function NotFound() {
   useTitre("Page introuvable");
   return (
     <main className="mx-auto max-w-xl px-5 py-20 text-center sm:px-8">
-      <p className="font-display text-7xl font-semibold text-accent">404</p>
-      <h1 className="mt-2 font-display text-3xl font-semibold text-ink">Cette page n'existe pas</h1>
+      <p className="font-display text-7xl text-primary">404</p>
+      <h1 className="mt-2 font-display text-3xl text-ink">Cette page n'existe pas</h1>
       <p className="mt-2 text-muted">Le lien est peut-être ancien ou mal saisi. Reprenez depuis l'accueil.</p>
       <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
         <Link
@@ -17,7 +17,7 @@ export default function NotFound() {
         </Link>
         <Link
           to="/opportunites"
-          className="rounded-xl border border-line bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-primary"
+          className="rounded-xl border border-ink/40 bg-transparent px-5 py-2.5 text-sm font-semibold text-ink transition hover:border-ink"
         >
           Voir les opportunités
         </Link>

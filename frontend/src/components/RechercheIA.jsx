@@ -37,13 +37,9 @@ export default function RechercheIA() {
 
   return (
     <div className="relative overflow-hidden rounded-card border border-line bg-surface p-5 shadow-card">
-      <div
-        className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-feature opacity-[0.08] blur-3xl"
-        aria-hidden="true"
-      />
       <div className="relative">
-        <p className="text-xs font-bold uppercase tracking-widest text-feature">Recherche intelligente · bêta</p>
-        <h2 className="mt-1 font-display text-xl font-semibold text-ink">Décrivez votre situation</h2>
+        <p className="text-xs font-bold uppercase tracking-widest text-ink">Recherche intelligente · bêta</p>
+        <h2 className="mt-1 font-display text-xl text-ink">Décrivez votre situation</h2>
         <p className="mt-1 text-sm text-muted">
           Ex. « Je suis en Master 1, ressortissant d'Afrique subsaharienne, je cherche une bourse pour l'Europe. »
         </p>
@@ -62,12 +58,12 @@ export default function RechercheIA() {
           rows={3}
           maxLength={500}
           placeholder="Décrivez votre profil et ce que vous cherchez…"
-          className="mt-3 w-full rounded-lg border border-line bg-canvas p-3 text-sm text-ink placeholder:text-muted focus:border-feature focus:outline-none"
+          className="mt-3 w-full rounded-lg border border-line bg-canvas p-3 text-sm text-ink placeholder:text-muted focus:border-ink focus:outline-none"
         />
         <button
           onClick={handleRecherche}
           disabled={statut === "loading" || !description.trim()}
-          className="mt-3 rounded-xl bg-feature px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:brightness-110 disabled:opacity-60"
+          className="mt-3 rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-white shadow-card transition hover:brightness-110 disabled:opacity-60"
         >
           {statut === "loading" ? "Recherche en cours…" : "Rechercher avec l'IA"}
         </button>
@@ -94,16 +90,16 @@ export default function RechercheIA() {
                 key={r.id}
                 to={`/opportunites/${r.id}`}
                 style={{ "--delay": `${i * 70}ms` }}
-                className="animate-fade-up block rounded-xl border border-line bg-canvas p-4 transition hover:border-feature/40 hover:shadow-card"
+                className="animate-fade-up block rounded-xl border border-line bg-canvas p-4 transition hover:border-ink/40 hover:shadow-card"
               >
                 <div className="flex flex-wrap items-center gap-2">
                   <TypeBadge type={r.type} />
                   <VerifiedBadge date={r.dateVerification} />
                 </div>
-                <h3 className="mt-2 font-display text-base font-semibold text-ink">{r.titre}</h3>
+                <h3 className="mt-2 font-display text-base text-ink">{r.titre}</h3>
                 <p className="text-sm text-muted">{r.organisme}</p>
                 {r.raisonIA && (
-                  <p className="mt-2 border-l-2 border-feature pl-3 text-sm italic text-ink/80">{r.raisonIA}</p>
+                  <p className="mt-2 border-l-2 border-ink pl-3 font-serif text-base italic text-ink/80">{r.raisonIA}</p>
                 )}
               </Link>
             ))}

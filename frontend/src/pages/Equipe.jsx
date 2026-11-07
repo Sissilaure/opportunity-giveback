@@ -28,7 +28,7 @@ export default function Equipe() {
   return (
     <main className="mx-auto max-w-6xl px-5 pb-14 pt-6 sm:px-8 sm:pt-10">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Notre équipe</p>
-      <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+      <h1 className="mt-1 font-display text-4xl tracking-tight text-ink sm:text-5xl">
         Une petite équipe, une grande mission
       </h1>
       <p className="mt-2 max-w-2xl text-base text-muted">
@@ -43,12 +43,12 @@ export default function Equipe() {
         {membres.map((m, i) => (
           <article key={m.id} style={{ "--delay": `${i * 70}ms` }} className="animate-fade-up rounded-card border border-line bg-surface p-5 shadow-card">
             <div
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-primary font-display text-lg font-semibold text-white"
+              className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary font-serif text-lg text-white"
               aria-hidden="true"
             >
               {initiales(m.nom)}
             </div>
-            <h2 className="mt-3 font-display text-lg font-semibold text-ink">{m.nom}</h2>
+            <h2 className="mt-3 font-display text-lg text-ink">{m.nom}</h2>
             <p className="text-sm font-medium text-accent-dark">{m.role}</p>
             <p className="mt-2 text-sm text-muted">{m.description}</p>
           </article>
@@ -56,7 +56,7 @@ export default function Equipe() {
       </div>
 
       <div className="mt-10 rounded-card border border-line bg-accent-light p-5">
-        <h2 className="font-display text-xl font-semibold text-ink">Une question ? Contactez-nous</h2>
+        <h2 className="font-display text-xl text-ink">Une question ? Contactez-nous</h2>
         <p className="mt-1 text-sm text-ink/80">
           Posez-la depuis la page Aide : un membre de l'équipe vous répond, et la réponse enrichit la FAQ pour les
           autres candidats.

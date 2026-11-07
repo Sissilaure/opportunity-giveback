@@ -6,6 +6,7 @@ import useTitre from "../hooks/useTitre";
 import OpportuniteCard from "../components/OpportuniteCard";
 import Newsletter from "../components/Newsletter";
 import Reveal from "../components/Reveal";
+import Soleil from "../components/Soleil";
 import CountUp from "../components/CountUp";
 import { ChevronRightIcon, ChevronDownIcon, CheckIcon } from "../components/icons";
 
@@ -59,7 +60,7 @@ function SectionTitre({ surtitre, titre, texte }) {
   return (
     <Reveal className="max-w-2xl">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">{surtitre}</p>
-      <h2 className="mt-1 font-display text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
+      <h2 className="mt-1 font-display text-3xl leading-tight tracking-tight text-ink sm:text-4xl">
         {titre}
       </h2>
       {texte && <p className="mt-2 text-base text-muted">{texte}</p>}
@@ -70,7 +71,7 @@ function SectionTitre({ surtitre, titre, texte }) {
 function Statistique({ valeur, libelle }) {
   return (
     <div>
-      <p className="font-display text-5xl font-semibold text-primary">
+      <p className="font-serif text-5xl text-primary">
         <CountUp valeur={valeur} />
       </p>
       <p className="mt-1 text-sm text-muted">{libelle}</p>
@@ -105,72 +106,49 @@ export default function Accueil() {
 
   return (
     <main>
-      <section className="relative overflow-hidden border-b border-line bg-glow">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 pb-14 pt-10 sm:px-8 sm:pb-20 sm:pt-16 lg:grid-cols-[1.15fr_1fr]">
-          <div>
-            <p className="animate-fade-up inline-flex items-center gap-2 rounded-full bg-surface px-3 py-1 text-xs font-semibold text-success shadow-card">
-              <CheckIcon className="h-3 w-3" /> Bourses, stages et opportunités vérifiés
+      <section className="border-b border-line">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-5 pb-14 pt-8 sm:px-8 sm:pb-20 sm:pt-14 lg:grid-cols-[1.1fr_1fr] lg:gap-14">
+          <div className="order-first mx-auto w-44 sm:w-60 lg:order-last lg:w-full lg:max-w-md">
+            <Soleil className="h-auto w-full" />
+          </div>
+
+          <div className="text-center lg:text-left">
+            <p className="animate-fade-up inline-flex items-center gap-2 rounded-md border border-line px-3 py-1.5 text-xs font-semibold text-success">
+              <CheckIcon className="h-3 w-3" /> Opportunités vérifiées, avec la source officielle
             </p>
             <h1
-              className="animate-fade-up mt-4 font-display text-4xl font-semibold leading-[1.1] tracking-tight text-ink sm:text-6xl"
+              className="animate-fade-up mt-5 font-serif text-5xl italic leading-[1.05] text-ink sm:text-7xl"
               style={{ "--delay": "100ms" }}
             >
-              Chaque opportunité mérite d'être <span className="text-accent-dark">trouvée</span>.
+              Les opportunités existent.
+              <span className="block text-primary">On les rend visibles.</span>
             </h1>
-            <p className="animate-fade-up mt-4 max-w-xl text-lg text-muted" style={{ "--delay": "200ms" }}>
-              Nous recensons et expliquons les bourses d'études, stages, emplois et concours destinés aux jeunes
-              africains. Information vérifiée, critères clairs, lien direct vers la plateforme officielle.
+            <p className="animate-fade-up mx-auto mt-5 max-w-xl text-lg text-muted lg:mx-0" style={{ "--delay": "200ms" }}>
+              Bourses, stages, emplois et formations vérifiés pour les jeunes, avec les critères clairs et le lien direct
+              vers la plateforme officielle.
             </p>
-            <div className="animate-fade-up mt-7 flex flex-col gap-3 sm:flex-row" style={{ "--delay": "300ms" }}>
+            <div className="animate-fade-up mt-7 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start" style={{ "--delay": "300ms" }}>
               <Link
                 to="/opportunites"
-                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white shadow-card transition hover:bg-primary-dark hover:shadow-card-hover"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-dark"
               >
                 Explorer les opportunités
                 <ChevronRightIcon className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 to="/ressources"
-                className="inline-flex items-center justify-center rounded-xl border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink shadow-card transition hover:border-primary"
+                className="inline-flex items-center justify-center rounded-xl border border-ink/40 bg-transparent px-6 py-3 text-sm font-semibold text-ink transition hover:border-ink"
               >
                 Comment candidater
               </Link>
             </div>
 
             {stats && (
-              <div className="animate-fade-up mt-12 grid grid-cols-2 gap-6 border-t border-line pt-8 sm:max-w-md" style={{ "--delay": "400ms" }}>
+              <div className="animate-fade-up mx-auto mt-12 grid max-w-md grid-cols-2 gap-6 border-t border-line pt-8 text-left lg:mx-0" style={{ "--delay": "400ms" }}>
                 <Statistique valeur={stats.total} libelle="opportunités vérifiées et ouvertes" />
                 <Statistique valeur={stats.organismes} libelle="organismes partenaires" />
               </div>
             )}
-          </div>
-
-          <div className="animate-fade-up relative mx-auto w-full max-w-md lg:max-w-none" style={{ "--delay": "250ms" }} aria-hidden="true">
-            <div className="overflow-hidden rounded-[28px] shadow-card-hover">
-              <img
-                src="/images/accompagnement.jpg"
-                alt=""
-                width="1000"
-                height="667"
-                fetchPriority="high"
-                className="aspect-[4/3] w-full object-cover"
-              />
-            </div>
-            <div className="animate-float absolute -bottom-6 -left-4 hidden w-44 overflow-hidden rounded-2xl border-4 border-canvas shadow-card-hover sm:block">
-              <img src="/images/campus.jpg" alt="" width="1000" height="563" loading="lazy" className="aspect-[16/10] w-full object-cover" />
-            </div>
-            <div
-              className="animate-pop-in absolute right-2 top-6 flex items-center gap-2 rounded-xl bg-surface px-3 py-2 shadow-card-hover sm:-right-4"
-              style={{ "--delay": "700ms" }}
-            >
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-success-bg text-success">
-                <CheckIcon className="h-4 w-4" />
-              </span>
-              <span className="text-xs font-semibold text-ink">
-                Source officielle
-                <span className="block font-normal text-muted">vérifiée par l'équipe</span>
-              </span>
-            </div>
           </div>
         </div>
       </section>
@@ -197,14 +175,14 @@ export default function Accueil() {
                       loading="lazy"
                       width="1000"
                       height="563"
-                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                      className="h-full w-full object-cover saturate-75 transition-transform duration-700 ease-out group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/70 via-primary-dark/10 to-transparent" />
-                    <p className="absolute bottom-3 left-4 font-display text-4xl font-semibold text-white">{nombre}</p>
+                    <div className="absolute inset-0 bg-ink/35" />
+                    <p className="absolute bottom-3 left-4 font-serif text-4xl text-white">{nombre}</p>
                     <span className={`absolute inset-x-0 bottom-0 h-1 ${TYPE_STYLES[c.type].bar}`} aria-hidden="true" />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-display text-lg font-semibold text-ink">{c.titre}</h3>
+                    <h3 className="font-display text-lg text-ink">{c.titre}</h3>
                     <p className="mt-1 text-sm text-muted">{c.texte}</p>
                     <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary">
                       Voir les opportunités{" "}
@@ -252,8 +230,8 @@ export default function Accueil() {
           {ETAPES.map((e, i) => (
             <Reveal as="li" key={e.titre} delay={i * 90}>
               <div className="h-full rounded-card border border-line bg-surface p-4 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover">
-                <span className="font-display text-3xl font-semibold text-accent">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="mt-1 font-display text-lg font-semibold text-ink">{e.titre}</h3>
+                <span className="font-serif text-3xl text-primary">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="mt-1 font-display text-lg text-ink">{e.titre}</h3>
                 <p className="mt-1 text-sm text-muted">{e.texte}</p>
               </div>
             </Reveal>
@@ -264,7 +242,7 @@ export default function Accueil() {
       <section className="border-y border-line bg-surface">
         <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
           <SectionTitre
-            surtitre="Pourquoi Opportunity Hub"
+            surtitre="Pourquoi Yeelen"
             titre="L'information, ce n'est pas assez. Il faut la comprendre."
             texte="Savoir qu'une bourse existe ne suffit pas : il faut savoir qui peut postuler, quoi fournir et quand."
           />
@@ -272,15 +250,15 @@ export default function Accueil() {
             {ARGUMENTS.map((a, i) => (
               <Reveal key={a.titre} delay={i * 100}>
                 <div className="h-full rounded-card border border-line bg-canvas p-5">
-                  <h3 className="font-display text-xl font-semibold text-ink">{a.titre}</h3>
+                  <h3 className="font-display text-xl text-ink">{a.titre}</h3>
                   <p className="mt-2 text-sm text-muted">{a.texte}</p>
                 </div>
               </Reveal>
             ))}
           </div>
-          <Reveal className="mt-6 rounded-card bg-primary p-5 text-white sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <Reveal className="mt-6 rounded-card bg-ink p-5 text-white sm:flex sm:items-center sm:justify-between sm:gap-6">
             <div>
-              <p className="font-display text-xl font-semibold">Une recherche qui comprend votre situation</p>
+              <p className="font-serif text-2xl">Une recherche qui comprend votre situation</p>
               <p className="mt-1 text-sm text-white/80">
                 Décrivez votre profil en une phrase : l'IA classe les opportunités par pertinence. Ses suggestions
                 restent à vérifier sur la source officielle.
@@ -288,7 +266,7 @@ export default function Accueil() {
             </div>
             <Link
               to="/opportunites"
-              className="mt-4 inline-block shrink-0 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-primary-dark transition hover:brightness-110 sm:mt-0"
+              className="mt-4 inline-block shrink-0 rounded-xl bg-accent px-5 py-2.5 text-sm font-semibold text-primary-dark transition hover:bg-primary-dark sm:mt-0"
             >
               Essayer la recherche intelligente
             </Link>
@@ -302,10 +280,10 @@ export default function Accueil() {
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
             {temoignages.map((t, i) => (
               <Reveal as="figure" key={t.id} delay={i * 100} className="rounded-card border border-line bg-surface p-6 shadow-card">
-                <span className="font-display text-5xl leading-none text-accent" aria-hidden="true">
+                <span className="font-serif text-5xl leading-none text-primary" aria-hidden="true">
                   “
                 </span>
-                <blockquote className="-mt-2 font-display text-lg leading-relaxed text-ink">{t.texte}</blockquote>
+                <blockquote className="-mt-2 font-serif text-xl italic leading-relaxed text-ink">{t.texte}</blockquote>
                 <figcaption className="mt-4 text-sm">
                   <span className="font-semibold text-ink">{t.nom}</span>
                   <span className="text-muted">
@@ -339,7 +317,7 @@ export default function Accueil() {
                     >
                       <span>{item.question}</span>
                       <ChevronDownIcon
-                        className={`h-4 w-4 shrink-0 text-accent transition-transform duration-300 ${ouverte ? "rotate-180" : ""}`}
+                        className={`h-4 w-4 shrink-0 text-primary transition-transform duration-300 ${ouverte ? "rotate-180" : ""}`}
                       />
                     </button>
                     {/* grid 0fr -> 1fr : ouverture fluide sans connaître la hauteur du texte */}

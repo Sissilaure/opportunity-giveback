@@ -15,10 +15,10 @@ export default function FilterTabs({ value, onChange }) {
           key={f.value}
           onClick={() => onChange(f.value)}
           aria-pressed={value === f.value}
-          className={`min-h-[40px] shrink-0 snap-start whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all ${
+          className={`min-h-[40px] shrink-0 snap-start whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium transition-all ${
             value === f.value
-              ? "bg-primary text-white shadow-card"
-              : "bg-surface text-ink shadow-card hover:bg-primary-light"
+              ? "border border-primary bg-primary text-white"
+              : "border border-line bg-surface text-ink hover:border-ink/40"
           }`}
         >
           {f.label}

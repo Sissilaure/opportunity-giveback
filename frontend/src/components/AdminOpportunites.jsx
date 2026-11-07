@@ -113,8 +113,8 @@ export default function AdminOpportunites() {
     <div className="mt-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-feature">Opportunités</p>
-          <h2 className="mt-1 font-display text-xl font-bold text-ink">Alimentation du répertoire</h2>
+          <p className="text-xs font-bold uppercase tracking-widest text-ink">Opportunités</p>
+          <h2 className="mt-1 font-display text-xl text-ink">Alimentation du répertoire</h2>
           <p className="mt-0.5 text-xs text-muted">
             Le système cherche automatiquement chaque jour, pas besoin de cliquer. Ce bouton force juste un passage immédiat.
           </p>
@@ -123,13 +123,13 @@ export default function AdminOpportunites() {
           <button
             onClick={handleRechercheIA}
             disabled={rechercheEnCours}
-            className="rounded-xl bg-feature px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:brightness-110 disabled:opacity-60"
+            className="rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:brightness-110 disabled:opacity-60"
           >
             {rechercheEnCours ? "Recherche…" : "Forcer une recherche maintenant"}
           </button>
           <button
             onClick={() => setFormVisible((v) => !v)}
-            className="rounded-xl border border-line bg-surface px-4 py-2 text-sm font-semibold text-ink shadow-card transition hover:bg-canvas"
+            className="rounded-xl border border-ink/40 bg-transparent px-4 py-2 text-sm font-semibold text-ink shadow-card transition hover:bg-canvas"
           >
             {formVisible ? "Annuler" : "Ajouter manuellement"}
           </button>

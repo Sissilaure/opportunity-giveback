@@ -64,15 +64,15 @@ export default function Repertoire() {
           <div className="animate-fade-up flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Répertoire</p>
-              <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
+              <h1 className="mt-1 font-display text-4xl tracking-tight text-ink sm:text-5xl">
                 Opportunités
               </h1>
-              <p className="mt-1 text-base italic text-muted">Vérifiées pour votre avenir</p>
+              <p className="mt-1 font-serif text-xl italic text-muted">Vérifiées pour votre avenir</p>
             </div>
 
             {!erreur && (
               <div className="flex items-baseline gap-2 sm:flex-col sm:items-end sm:gap-0" aria-live="polite">
-                <span className="font-display text-4xl font-semibold text-primary">
+                <span className="font-serif text-4xl text-primary">
                   {chargement ? "…" : opportunites.length}
                 </span>
                 <span className="text-sm font-semibold text-muted">
@@ -101,7 +101,7 @@ export default function Repertoire() {
             <span>{erreur}</span>
             <button
               onClick={() => setTentative((n) => n + 1)}
-              className="min-h-[40px] rounded-lg bg-danger px-4 py-2 font-semibold text-white hover:brightness-110"
+              className="min-h-[40px] rounded-lg bg-danger px-4 py-2 font-semibold text-white hover:bg-primary-dark"
             >
               Réessayer
             </button>
@@ -116,7 +116,7 @@ export default function Repertoire() {
 
         {!chargement && !erreur && opportunites.length === 0 && (
           <div className="animate-fade-up rounded-card border border-dashed border-line bg-surface px-6 py-14 text-center">
-            <p className="font-display text-xl font-semibold text-ink">Aucune opportunité ne correspond</p>
+            <p className="font-serif text-2xl text-ink">Aucune opportunité ne correspond</p>
             <p className="mt-1 text-sm text-muted">Essayez un autre mot-clé, ou affichez toutes les catégories.</p>
             {(q || type !== "toutes") && (
               <button

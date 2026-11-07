@@ -5,7 +5,7 @@ export default function Confidentialite() {
   return (
     <main className="mx-auto max-w-2xl px-5 pb-14 pt-6 sm:px-8 sm:pt-10">
       <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Confidentialité</p>
-      <h1 className="mt-1 font-display text-4xl font-semibold tracking-tight text-ink">Vos données</h1>
+      <h1 className="mt-1 font-display text-4xl tracking-tight text-ink">Vos données</h1>
       <p className="mt-2 text-base text-muted">
         Nous ne collectons que ce qui est nécessaire au service, et rien d'autre.
       </p>

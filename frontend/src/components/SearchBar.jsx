@@ -14,7 +14,7 @@ export default function SearchBar({ value, onChange }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Rechercher une bourse…"
-        className="w-full rounded-full border border-line bg-surface py-3 pl-9 pr-4 text-sm text-ink placeholder:text-muted shadow-card focus:border-primary focus:outline-none"
+        className="w-full rounded-lg border border-line bg-surface py-3 pl-9 pr-4 text-sm text-ink placeholder:text-muted shadow-card focus:border-primary focus:outline-none"
       />
     </div>
   );

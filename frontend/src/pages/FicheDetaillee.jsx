@@ -121,17 +121,16 @@ export default function FicheDetaillee() {
           alt=""
           width="1000"
           height="563"
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover saturate-75"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/50 to-transparent" aria-hidden="true" />
       </div>
 
       <div className="animate-fade-up mt-5" style={{ "--delay": "80ms" }}>
         <TypeBadge type={opp.type} />
-        <h1 className="mt-2 font-display text-2xl font-semibold leading-snug tracking-tight text-ink sm:text-3xl">
+        <h1 className="mt-2 font-display text-2xl leading-snug tracking-tight text-ink sm:text-3xl">
           {opp.titre}
         </h1>
-        <p className="mt-1 text-base italic text-muted">{opp.organisme}</p>
+        <p className="mt-1 font-serif text-xl italic text-muted">{opp.organisme}</p>
         <div className="mt-2">
           <VerifiedBadge date={opp.dateVerification} />
         </div>
@@ -163,7 +162,7 @@ export default function FicheDetaillee() {
                 opp.statutEcheance === "proche" || opp.statutEcheance === "depassee" ? "bg-danger-bg" : "bg-primary-light"
               }`}
             >
-              <span className="font-display text-4xl font-semibold text-ink">
+              <span className="font-serif text-4xl text-ink">
                 {opp.statutEcheance === "depassee" ? "Clos" : `${opp.joursRestants}j`}
               </span>
               <div>
@@ -201,7 +200,7 @@ export default function FicheDetaillee() {
           onClick={handleToggleSuivi}
           aria-pressed={suivi}
           className={`flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition ${
-            suivi ? "border-primary bg-primary-light text-primary" : "border-line bg-surface text-ink hover:border-primary"
+            suivi ? "border-primary bg-primary-light text-primary" : "border-line bg-surface text-ink hover:border-ink"
           }`}
         >
           {suivi && <CheckIcon className="h-4 w-4" />}
@@ -210,14 +209,14 @@ export default function FicheDetaillee() {
         <div className="grid grid-cols-2 gap-2.5">
           <button
             onClick={handlePartager}
-            className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface py-3 text-sm font-semibold text-ink transition hover:border-primary"
+            className="flex items-center justify-center gap-2 rounded-xl border border-ink/40 bg-transparent py-3 text-sm font-semibold text-ink transition hover:border-ink"
           >
             Partager
           </button>
           {opp.dateEcheance && opp.statutEcheance !== "depassee" && (
             <button
               onClick={handleCalendrier}
-              className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface py-3 text-sm font-semibold text-ink transition hover:border-primary"
+              className="flex items-center justify-center gap-2 rounded-xl border border-ink/40 bg-transparent py-3 text-sm font-semibold text-ink transition hover:border-ink"
             >
               Rappel calendrier
             </button>
@@ -234,7 +233,7 @@ export default function FicheDetaillee() {
       </div>
 
       <p className="mt-6 text-xs leading-relaxed text-muted">
-        Opportunity Hub facilite l'accès à cette opportunité et ne garantit pas son obtention.
+        Yeelen facilite l'accès à cette opportunité et ne garantit pas son obtention.
         La décision finale appartient à l'organisme cité ci-dessus.
       </p>
     </main>

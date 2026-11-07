@@ -18,10 +18,9 @@ export default function OpportuniteCard({ opportunite }) {
           loading="lazy"
           width="1000"
           height="563"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="h-full w-full object-cover saturate-75 transition-transform duration-700 ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-primary-dark/60 via-transparent to-transparent" aria-hidden="true" />
-        <div className="absolute left-3 top-3 rounded bg-surface/95 shadow-card">
+        <div className="absolute left-3 top-3">
           <TypeBadge type={opportunite.type} />
         </div>
         <span
@@ -31,7 +30,7 @@ export default function OpportuniteCard({ opportunite }) {
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-display text-lg font-semibold leading-snug text-ink">{opportunite.titre}</h3>
+        <h3 className="font-display text-lg leading-snug text-ink">{opportunite.titre}</h3>
         <p className="mt-0.5 text-sm text-muted">{opportunite.organisme}</p>
 
         <div className="mt-auto flex flex-wrap gap-2 pt-3">

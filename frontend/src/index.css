@@ -4,19 +4,27 @@
 
 body {
   margin: 0;
-  background-color: #faf9f6;
-  color: #10151f;
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #f4efe6;
+  color: #191817;
+  font-family: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 h1,
 h2,
 h3 {
-  font-family: "Fraunces", Georgia, "Times New Roman", serif;
+  font-family: "Italiana", Georgia, "Times New Roman", serif;
+  font-weight: 400; /* Italiana n'a qu'une graisse : pas de gras synthétique */
 }
 
+/* Grands titres : majuscules espacées. Les titres de section gardent la casse, avec un léger espacement. */
+h1.font-display { text-transform: uppercase; letter-spacing: 0.06em; }
+h2.font-display { letter-spacing: 0.03em; }
+/* Italiana est trop fine en petit : les titres de cartes passent en Instrument Sans. */
+h3.font-display { font-family: "Instrument Sans", system-ui, sans-serif; font-weight: 600; letter-spacing: 0; }
+::selection { background: #d6b172; color: #191817; }
+
 :focus-visible {
-  outline: 2px solid #1b2a4a;
+  outline: 2px solid #8f4e35;
   outline-offset: 2px;
 }
 
@@ -98,13 +106,19 @@ h3 {
   .reveal.is-visible { opacity: 1; transform: none; }
 
   .skeleton {
-    background: linear-gradient(90deg, #ece9e2 25%, #f7f5f0 50%, #ece9e2 75%);
+    background: linear-gradient(90deg, #eeebe5 25%, #f4efe6 50%, #eeebe5 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s linear infinite;
   }
 }
 
 /* Pour les personnes sensibles au mouvement : plus d'animation, contenu directement visible. */
+@keyframes bande-in {
+  from { opacity: 0; transform: scaleX(0.55); }
+  to { opacity: 1; transform: none; }
+}
+.soleil-bande { transform-box: fill-box; transform-origin: center; animation: bande-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: var(--delay, 0ms); }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -123,8 +137,8 @@ html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   input:not([type="checkbox"]):not([type="radio"]), textarea, select { font-size: 16px !important; }
 }
 a, button, summary, label, input, select, textarea { touch-action: manipulation; }
-button, a { -webkit-tap-highlight-color: rgba(27, 42, 74, 0.08); }
+button, a { -webkit-tap-highlight-color: rgba(143, 78, 53, 0.10); }
 body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 footer { padding-bottom: env(safe-area-inset-bottom); }
-:focus-visible { outline: 2px solid #1B2A4A; outline-offset: 2px; border-radius: 4px; }
+:focus-visible { outline: 2px solid #8F4E35; outline-offset: 2px; border-radius: 4px; }
 

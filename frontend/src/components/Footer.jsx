@@ -34,9 +34,8 @@ export default function Footer() {
     <footer className="border-t border-line bg-surface">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-8 md:grid-cols-4">
         <div>
-          <p className="font-display text-xl font-semibold text-ink">
-            Opportunity <span className="text-accent">Hub</span>
-          </p>
+          <img src="/brand/logo-header.svg" alt="Yeelen" width="205" height="40" className="h-9 w-auto" loading="lazy" />
+          <p className="mt-3 font-serif text-lg italic text-ink">Les opportunités existent. <span className="text-primary">On les rend visibles.</span></p>
           <p className="mt-2 text-sm text-muted">
             Bourses, stages et opportunités vérifiés pour les étudiant·e·s et jeunes diplômé·e·s africain·e·s. Projet
             Give Back, 2iE.
@@ -61,7 +60,7 @@ export default function Footer() {
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-6xl px-5 py-4 text-xs text-muted sm:px-8">
-          © {new Date().getFullYear()} Opportunity Hub. La plateforme ne garantit pas l'obtention d'une bourse et ne
+          © {new Date().getFullYear()} Yeelen. La plateforme ne garantit pas l'obtention d'une bourse et ne
           remplace pas les sites officiels des organismes.
         </p>
       </div>

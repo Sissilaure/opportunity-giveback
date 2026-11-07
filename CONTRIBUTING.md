@@ -1,4 +1,4 @@
-# Contribuer à Opportunity Hub
+# Contribuer à Yeelen
 
 Merci de participer ! Ce guide explique comment travailler à plusieurs sans casser le site en production.
 

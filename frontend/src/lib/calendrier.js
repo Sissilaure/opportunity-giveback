@@ -35,7 +35,7 @@ export function genererICS({ id, titre, organisme, dateEcheance, url }, maintena
   const lignes = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Opportunity Hub//FR",
+    "PRODID:-//Yeelen//FR",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
     `UID:opportunite-${id}@opportunity-hub`,

@@ -23,11 +23,11 @@ export default function Newsletter() {
   }
 
   return (
-    <section id="newsletter" className="bg-primary text-white">
+    <section id="newsletter" className="bg-ink text-white">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-12 sm:px-8 md:grid-cols-2 md:items-center md:py-16">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-accent">Alerte opportunités</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold leading-tight sm:text-4xl">
+          <h2 className="mt-2 font-display text-3xl leading-tight sm:text-4xl">
             Ne ratez plus aucune échéance
           </h2>
           <p className="mt-3 text-base text-white/80">
@@ -76,7 +76,7 @@ export default function Newsletter() {
           <button
             type="submit"
             disabled={statut === "sending"}
-            className="mt-5 w-full rounded-xl bg-accent py-3 text-sm font-semibold text-primary-dark transition hover:brightness-110 disabled:opacity-60"
+            className="mt-5 w-full rounded-xl bg-accent py-3 text-sm font-semibold text-primary-dark transition hover:bg-primary-dark disabled:opacity-60"
           >
             {statut === "sending" ? "Inscription…" : "Je m'inscris"}
           </button>

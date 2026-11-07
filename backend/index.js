@@ -39,7 +39,7 @@ async function cycleAutomatique() {
 
 Promise.all([initializeQuestionsTable(), initializeAdminTable(), initializeNewsletterTable()])
   .then(() => {
-    app.listen(PORT, () => console.log(`Backend Opportunity Hub sur http://localhost:${PORT}`));
+    app.listen(PORT, () => console.log(`Backend Yeelen sur http://localhost:${PORT}`));
 
     // Un premier passage au démarrage (pas besoin d'attendre le lendemain 6h pour voir
     // le système proposer quelque chose), puis un passage quotidien.

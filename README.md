@@ -1,4 +1,4 @@
-# Opportunity Hub
+# Yeelen
 
 Répertoire de bourses, stages, emplois et concours vérifiés, destiné aux étudiant·e·s
 africain·e·s francophones. Une équipe humaine valide chaque opportunité avant
@@ -23,7 +23,7 @@ publié automatiquement.
 ## Aperçu du projet
 
 Ce dépôt est la **plateforme commune** issue de la charte de projet Give Back, 2iE : elle réunit
-le moteur d'Opportunity Hub (groupe 2 : catalogue vérifié, recherche IA, FAQ, espace équipe) et la
+le moteur d'Yeelen (groupe 2 : catalogue vérifié, recherche IA, FAQ, espace équipe) et la
 charte visuelle et les contenus du site Africa Opportunities (groupe 1 : accueil, catégories, étapes,
 témoignages, équipe, newsletter).
 
@@ -192,10 +192,21 @@ Mesures en place (et testées dans `backend/tests/api.test.js`) :
 
 ## Design et animations
 
-Charte reprise du site Africa Opportunities (groupe 1) : Fraunces + Inter, bleu nuit, crème, or, vert.
-Animations en CSS pur (`index.css`, `Reveal.jsx`, `CountUp.jsx`) : apparition au défilement, compteurs,
-transition de page, squelettes de chargement. Elles sont désactivées pour les personnes qui demandent de
-réduire les animations (`prefers-reduced-motion`).
+Identité **Yeelen** (« lumière » en dioula) : sobre, éditoriale, beaucoup d'espace.
+
+- **Couleurs** : crème `#F4EFE6` (fond), `#EEEBE5` (cartes), encre `#191817`, pierre `#6A6660`, latérite `#8F4E35`
+  (boutons, liens, états actifs), or d'aube `#D6B172` (badges, détails). Contrastes vérifiés au niveau WCAG AA.
+- **Polices** : Italiana (grands titres, majuscules espacées), Instrument Sans (texte et interface),
+  Instrument Serif italique (slogan, citations, sous-titres).
+- **Où changer la charte** : `frontend/tailwind.config.js` (couleurs, polices, arrondis, ombres) et
+  `frontend/src/index.css` (règles des titres). Les composants n'utilisent que des noms de rôle (`primary`, `accent`,
+  `canvas`, `ink`…), jamais de couleur en dur.
+- **Fichiers de marque** : `frontend/public/brand/` (logos SVG, symbole), `favicon.*`, `apple-touch-icon.png`,
+  `icon-*.png`, `og-image.png`, `manifest.webmanifest`. `VITE_SITE_URL` (voir `frontend/.env.production`) donne
+  l'adresse absolue de l'image d'aperçu des liens : à régler sur le domaine réel.
+- **Animations** en CSS pur (`index.css`, `Reveal.jsx`, `CountUp.jsx`, `Soleil.jsx`) : apparition au défilement,
+  compteurs, transition de page, bandes du soleil qui s'allument. Désactivées pour les personnes qui demandent de
+  réduire les animations (`prefers-reduced-motion`).
 
 Photos : [Pexels](https://www.pexels.com) (licence libre, attribution non requise), hébergées dans
 `frontend/public/images`. L'image d'une opportunité dépend de son type ; une même catégorie en alterne
