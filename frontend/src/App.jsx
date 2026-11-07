@@ -9,6 +9,8 @@ import RessourceDetail from "./pages/RessourceDetail";
 import Aide from "./pages/Aide";
 import Equipe from "./pages/Equipe";
 import Suivi from "./pages/Suivi";
+import Connexion from "./pages/Connexion";
+import Notifications from "./pages/Notifications";
 import Confidentialite from "./pages/Confidentialite";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -49,6 +51,8 @@ function PagePublique() {
           <Route path="/aide" element={<Aide />} />
           <Route path="/equipe" element={<Equipe />} />
           <Route path="/suivi" element={<Suivi />} />
+          <Route path="/connexion" element={<Connexion />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/confidentialite" element={<Confidentialite />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

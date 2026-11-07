@@ -2,16 +2,27 @@ const { safeHttpUrl } = require("./security");
 
 const SEUIL_ALERTE_JOURS = 15;
 
-function formatOpportunite(row) {
-  const aujourdHui = new Date();
-  aujourdHui.setHours(0, 0, 0, 0);
+// Jours calendaires entre aujourd'hui et une date d'échéance, indépendants du fuseau horaire et du format reçu :
+// mysql2 renvoie un Date (minuit local) mais une base ou un pilote configuré autrement peut donner « 2026-03-15 » ou un
+// ISO en UTC. On ne garde que année-mois-jour, comme l'échéance a été saisie, puis on compte des jours entiers.
+function joursAvant(echeance, maintenant = new Date()) {
+  const texte = echeance instanceof Date
+    ? `${echeance.getFullYear()}-${String(echeance.getMonth() + 1).padStart(2, "0")}-${String(echeance.getDate()).padStart(2, "0")}`
+    : String(echeance).slice(0, 10);
+  const [a, m, j] = texte.split("-").map(Number);
+  if (!a || !m || !j) return null;
+  const jourEcheance = Date.UTC(a, m - 1, j);
+  const aujourdHui = Date.UTC(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate());
+  return Math.round((jourEcheance - aujourdHui) / 86400000);
+}
 
+function formatOpportunite(row) {
   let joursRestants = null;
   let statutEcheance = "permanente";
   if (row.date_echeance) {
-    const echeance = new Date(row.date_echeance);
-    joursRestants = Math.ceil((echeance - aujourdHui) / (1000 * 60 * 60 * 24));
-    if (joursRestants < 0) statutEcheance = "depassee";
+    joursRestants = joursAvant(row.date_echeance);
+    if (joursRestants === null) statutEcheance = "permanente";
+    else if (joursRestants < 0) statutEcheance = "depassee";
     else if (joursRestants <= SEUIL_ALERTE_JOURS) statutEcheance = "proche";
     else statutEcheance = "normale";
   }
@@ -32,6 +43,10 @@ function formatOpportunite(row) {
     lienSource: safeHttpUrl(row.lien_source),
     dateVerification: row.date_verification,
     statut: row.statut,
+    // Image d'aperçu de l'organisme (https uniquement) ; absente → l'interface retombe sur une photo par type.
+    imageUrl: row.image_url && String(row.image_url).startsWith("https://") ? safeHttpUrl(row.image_url) : null,
+    // Publiée sans relecture humaine : l'interface le dit et invite à confirmer sur le site officiel.
+    verificationAuto: Boolean(row.verification_auto),
   };
 }
 
@@ -73,4 +88,4 @@ async function marquerExpirees(pool, joursApresEcheance = 20) {
   return result.affectedRows;
 }
 
-module.exports = { formatOpportunite, fetchOpportunitesVerifiees, findOrCreateStructure, marquerExpirees };
+module.exports = { joursAvant, formatOpportunite, fetchOpportunitesVerifiees, findOrCreateStructure, marquerExpirees };

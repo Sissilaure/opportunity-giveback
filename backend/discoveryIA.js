@@ -2,6 +2,19 @@ const { generateJson } = require("./gemini");
 const { fetchOpportunitesVerifiees, findOrCreateStructure } = require("./opportunites");
 const { TYPES_OPPORTUNITE } = require("./schemas");
 const { safeHttpUrl } = require("./security");
+const { verifierSource } = require("./verification");
+
+// Publication directe quand la source officielle a été lue et correspond ; sinon la piste reste « à vérifier ».
+// Désactivable (AUTO_PUBLISH=false) pour revenir à une validation humaine systématique.
+const autoPublier = () => process.env.AUTO_PUBLISH !== "false";
+
+async function verifierSansPlanter(candidat) {
+  try {
+    return await verifierSource(candidat);
+  } catch (err) {
+    return { verifiee: false, raison: err.message, imageUrl: null };
+  }
+}
 
 // Important : la clé Gemini gratuite de ce projet n'a pas accès au "grounding" Google Search
 // (quota 429 constaté), donc ce prompt s'appuie sur les connaissances propres du modèle, pas
@@ -30,10 +43,10 @@ Réponds strictement en JSON, sans aucun texte autour :
 {"propositions": [{"titre": "...", "type": "bourse|stage|emploi|concours|autre", "organisme": "...", "siteWeb": "https://...", "publicEligible": "...", "criteres": ["...", "..."], "piecesRequises": ["...", "..."], "lienSource": "https://..."}]}`;
 }
 
-async function rechercherNouvellesOpportunites(pool) {
+async function rechercherNouvellesOpportunites(pool, { verifier = verifierSansPlanter } = {}) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    return { ajoutees: 0, examinees: 0 };
+    return { ajoutees: 0, publiees: 0, examinees: 0 };
   }
 
   const existantes = await fetchOpportunitesVerifiees(pool);
@@ -48,6 +61,7 @@ async function rechercherNouvellesOpportunites(pool) {
 
   const propositions = Array.isArray(parsed.propositions) ? parsed.propositions : [];
   let ajoutees = 0;
+  let publiees = 0;
 
   for (const p of propositions) {
     if (!p || typeof p.titre !== "string" || typeof p.organisme !== "string" || typeof p.lienSource !== "string") {
@@ -67,11 +81,16 @@ async function rechercherNouvellesOpportunites(pool) {
     const [dup] = await pool.query("SELECT id FROM opportunite WHERE titre = ?", [titre]);
     if (dup.length > 0) continue;
 
-    const idStructure = await findOrCreateStructure(pool, organisme, siteWeb && siteWeb.length <= 255 ? siteWeb : null);
+    const siteSur = siteWeb && siteWeb.length <= 255 ? siteWeb : null;
+    const idStructure = await findOrCreateStructure(pool, organisme, siteSur);
+    const verification = autoPublier()
+      ? await verifier({ titre, organisme, lienSource, siteWeb: siteSur })
+      : { verifiee: false, imageUrl: null };
     await pool.query(
       `INSERT INTO opportunite
-         (titre, type, id_structure, public_eligible, criteres, pieces_requises, date_echeance, lien_source, date_verification, statut)
-       VALUES (?, ?, ?, ?, ?, ?, NULL, ?, NULL, 'a_verifier')`,
+         (titre, type, id_structure, public_eligible, criteres, pieces_requises, date_echeance, lien_source,
+          date_verification, statut, image_url, verification_auto)
+       VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ${verification.verifiee ? "NOW()" : "NULL"}, ?, ?, ?)`,
       [
         titre,
         p.type,
@@ -80,12 +99,41 @@ async function rechercherNouvellesOpportunites(pool) {
         Array.isArray(p.criteres) ? p.criteres.filter((c) => typeof c === "string").join("\n") : "",
         Array.isArray(p.piecesRequises) ? p.piecesRequises.filter((c) => typeof c === "string").join("\n") : "",
         lienSource,
+        verification.verifiee ? "verifiee" : "a_verifier",
+        verification.imageUrl,
+        verification.verifiee ? 1 : 0,
       ],
     );
     ajoutees += 1;
+    if (verification.verifiee) publiees += 1;
   }
 
-  return { ajoutees, examinees: propositions.length };
+  return { ajoutees, publiees, examinees: propositions.length };
 }
 
-module.exports = { rechercherNouvellesOpportunites };
+// Repasse chaque jour sur les pistes encore en attente (un site momentanément en panne la veille, par exemple) :
+// celles dont la source se vérifie enfin sont publiées. Au plus 10 par passage, pour rester léger.
+async function verifierEnAttente(pool) {
+  if (!autoPublier()) return 0;
+  const [lignes] = await pool.query(
+    `SELECT o.id, o.titre, o.lien_source, s.nom AS organisme, s.site_web
+     FROM opportunite o JOIN structure_partenaire s ON s.id_structure = o.id_structure
+     WHERE o.statut = 'a_verifier' AND o.lien_source IS NOT NULL
+     ORDER BY o.id DESC LIMIT 10`,
+  );
+  let publiees = 0;
+  for (const l of lignes) {
+    const lienSource = safeHttpUrl(l.lien_source);
+    if (!lienSource) continue;
+    const v = await verifierSansPlanter({ titre: l.titre, organisme: l.organisme, lienSource, siteWeb: safeHttpUrl(l.site_web) });
+    if (!v.verifiee) continue;
+    await pool.query(
+      "UPDATE opportunite SET statut = 'verifiee', date_verification = NOW(), image_url = ?, verification_auto = 1 WHERE id = ? AND statut = 'a_verifier'",
+      [v.imageUrl, l.id],
+    );
+    publiees += 1;
+  }
+  return publiees;
+}
+
+module.exports = { rechercherNouvellesOpportunites, verifierEnAttente };

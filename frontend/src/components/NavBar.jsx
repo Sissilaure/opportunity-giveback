@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { MenuIcon, CloseIcon } from "./icons";
+import { MenuIcon, CloseIcon, BellIcon } from "./icons";
+import { useAuth } from "../context/AuthContext";
 
 const LIENS = [
   { href: "/opportunites", label: "Opportunités" },
@@ -14,6 +15,7 @@ const estActif = (pathname, href) => pathname === href || pathname.startsWith(`$
 
 export default function NavBar() {
   const location = useLocation();
+  const { utilisateur, nonLues, deconnexion } = useAuth();
   const [menuOuvert, setMenuOuvert] = useState(false);
   const fermerMenu = () => setMenuOuvert(false);
   const [defile, setDefile] = useState(false);
@@ -56,6 +58,29 @@ export default function NavBar() {
               </Link>
             );
           })}
+          {utilisateur ? (
+            <>
+              <Link
+                to="/notifications"
+                aria-label={nonLues > 0 ? `Notifications : ${nonLues} non lue${nonLues > 1 ? "s" : ""}` : "Notifications"}
+                className="relative -mr-2 rounded-lg p-2 text-ink transition hover:text-primary"
+              >
+                <BellIcon className="h-6 w-6" />
+                {nonLues > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-primary px-1 text-[11px] font-semibold leading-none text-white">
+                    {nonLues > 9 ? "9+" : nonLues}
+                  </span>
+                )}
+              </Link>
+              <Link to="/suivi" className="text-sm font-medium text-muted transition-colors hover:text-ink">
+                Mon suivi
+              </Link>
+            </>
+          ) : (
+            <Link to="/connexion" className="text-sm font-medium text-muted transition-colors hover:text-ink">
+              Se connecter
+            </Link>
+          )}
           <Link
             to="/opportunites"
             className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-card transition hover:bg-primary-dark"
@@ -97,6 +122,27 @@ export default function NavBar() {
             <Link to="/suivi" onClick={fermerMenu} className="rounded-lg px-2 py-3.5 text-base font-medium text-ink">
               Mon suivi
             </Link>
+            {utilisateur ? (
+              <>
+                <Link to="/notifications" onClick={fermerMenu} className="flex items-center gap-2 rounded-lg px-2 py-3.5 text-base font-medium text-ink">
+                  Notifications
+                  {nonLues > 0 && <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-semibold text-white">{nonLues}</span>}
+                </Link>
+                <button
+                  onClick={() => {
+                    fermerMenu();
+                    deconnexion();
+                  }}
+                  className="rounded-lg px-2 py-3.5 text-left text-base font-medium text-muted"
+                >
+                  Me déconnecter
+                </button>
+              </>
+            ) : (
+              <Link to="/connexion" onClick={fermerMenu} className="rounded-lg px-2 py-3.5 text-base font-medium text-ink">
+                Se connecter
+              </Link>
+            )}
             <Link
               to="/opportunites"
               onClick={fermerMenu}

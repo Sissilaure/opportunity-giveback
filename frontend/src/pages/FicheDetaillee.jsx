@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchOpportunite } from "../lib/api";
+import { fetchOpportunite, fetchSuiviCompte, enregistrerSuiviCompte, retirerSuiviCompte } from "../lib/api";
+import { STATUTS_SUIVI } from "../lib/suiviStatuts";
+import { useAuth } from "../context/AuthContext";
+import OpportuniteImage from "../components/OpportuniteImage";
 import { estSuivi, toggleSuivi } from "../lib/suivi";
 import { lienSur } from "../lib/url";
-import { imageOpportunite } from "../lib/types";
 import { telechargerICS } from "../lib/calendrier";
 import useTitre from "../hooks/useTitre";
 import TypeBadge from "../components/TypeBadge";
@@ -43,6 +45,8 @@ export default function FicheDetaillee() {
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState(null);
   const [suivi, setSuivi] = useState(false);
+  const { utilisateur, rafraichirNotifications } = useAuth();
+  const [statutSuivi, setStatutSuivi] = useState("a_faire");
 
   useTitre(opp?.titre);
 
@@ -56,8 +60,50 @@ export default function FicheDetaillee() {
       .finally(() => setChargement(false));
   }, [id]);
 
-  function handleToggleSuivi() {
-    setSuivi(toggleSuivi(id));
+  // Avec un compte, l'état « suivi » et le statut de candidature viennent du serveur ; sans compte, de l'appareil.
+  useEffect(() => {
+    if (!utilisateur) return undefined;
+    let actuel = true;
+    fetchSuiviCompte()
+      .then((d) => {
+        const trouve = d.suivis.find((x) => String(x.id) === String(id));
+        if (!actuel) return;
+        setSuivi(Boolean(trouve));
+        if (trouve) setStatutSuivi(trouve.suiviStatut);
+      })
+      .catch(() => {});
+    return () => {
+      actuel = false;
+    };
+  }, [utilisateur, id]);
+
+  async function handleToggleSuivi() {
+    if (!utilisateur) {
+      setSuivi(toggleSuivi(id));
+      return;
+    }
+    try {
+      if (suivi) await retirerSuiviCompte(id);
+      else await enregistrerSuiviCompte(id, { statut: "a_faire" });
+      setSuivi(!suivi);
+      setStatutSuivi("a_faire");
+      rafraichirNotifications();
+    } catch (err) {
+      annoncer(err.message);
+    }
+  }
+
+  async function handleStatut(e) {
+    const statut = e.target.value;
+    const avant = statutSuivi;
+    setStatutSuivi(statut);
+    try {
+      await enregistrerSuiviCompte(id, { statut });
+      rafraichirNotifications();
+    } catch (err) {
+      setStatutSuivi(avant);
+      annoncer(err.message);
+    }
   }
 
   const [message, setMessage] = useState("");
@@ -116,13 +162,7 @@ export default function FicheDetaillee() {
       </Link>
 
       <div className="photo-chaude animate-fade-up relative mt-4 aspect-[21/9] overflow-hidden rounded-card bg-primary-light shadow-card">
-        <img
-          src={imageOpportunite(opp)}
-          alt=""
-          width="1000"
-          height="563"
-          className="h-full w-full object-cover saturate-75"
-        />
+        <OpportuniteImage opportunite={opp} eager className="h-full w-full object-cover saturate-75" />
       </div>
 
       <div className="animate-fade-up mt-5" style={{ "--delay": "80ms" }}>
@@ -132,7 +172,7 @@ export default function FicheDetaillee() {
         </h1>
         <p className="mt-1 font-serif text-xl italic text-muted">{opp.organisme}</p>
         <div className="mt-2">
-          <VerifiedBadge date={opp.dateVerification} />
+          <VerifiedBadge date={opp.dateVerification} auto={opp.verificationAuto} />
         </div>
       </div>
 
@@ -175,7 +215,11 @@ export default function FicheDetaillee() {
           </Section>
         ) : (
           <Section titre="Échéance">
-            <p className="text-sm text-muted">Opportunité permanente, sans date limite.</p>
+            <p className="text-sm text-muted">
+              {opp.verificationAuto
+                ? "Date limite non précisée ici : consultez le site officiel pour la connaître."
+                : "Opportunité permanente, sans date limite."}
+            </p>
           </Section>
         )}
       </div>
@@ -225,12 +269,46 @@ export default function FicheDetaillee() {
         <p role="status" aria-live="polite" className="min-h-[1.25rem] text-center text-sm text-success">
           {message}
         </p>
+        {utilisateur && suivi && (
+          <div>
+            <label htmlFor="statut-candidature" className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Ma candidature
+            </label>
+            <select
+              id="statut-candidature"
+              value={statutSuivi}
+              onChange={handleStatut}
+              className="mt-1.5 w-full rounded-lg border border-line bg-surface px-3 py-3 text-sm text-ink focus:border-primary focus:outline-none"
+            >
+              {STATUTS_SUIVI.map((x) => (
+                <option key={x.value} value={x.value}>
+                  {x.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        {utilisateur === null && !suivi && (
+          <p className="text-center text-xs text-muted">
+            <Link to={`/connexion?retour=/opportunites/${id}`} className="font-semibold text-primary underline-offset-2 hover:underline">
+              Connectez-vous
+            </Link>{" "}
+            pour être prévenu avant la date limite.
+          </p>
+        )}
         {suivi && (
           <Link to="/suivi" className="animate-pop-in block text-center text-sm font-medium text-primary hover:underline">
             Voir mon suivi →
           </Link>
         )}
       </div>
+
+      {opp.verificationAuto && (
+        <p className="mt-6 rounded-lg bg-accent-light px-4 py-3 text-sm leading-relaxed text-ink">
+          Cette fiche a été publiée après lecture automatique du site officiel. Les critères peuvent évoluer :
+          confirmez-les directement auprès de l'organisme avant de candidater.
+        </p>
+      )}
 
       <p className="mt-6 text-xs leading-relaxed text-muted">
         Yeelen facilite l'accès à cette opportunité et ne garantit pas son obtention.

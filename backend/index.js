@@ -1,8 +1,15 @@
 require("dotenv").config();
 const cron = require("node-cron");
 const createApp = require("./app");
-const { pool, initializeQuestionsTable, initializeAdminTable, initializeNewsletterTable } = require("./db");
-const { rechercherNouvellesOpportunites } = require("./discoveryIA");
+const {
+  pool,
+  initializeQuestionsTable,
+  initializeAdminTable,
+  initializeNewsletterTable,
+  initializeOpportuniteColumns,
+  initializeCompteTables,
+} = require("./db");
+const { rechercherNouvellesOpportunites, verifierEnAttente } = require("./discoveryIA");
 const { marquerExpirees } = require("./opportunites");
 const MySQLSessionStore = require("./sessionStore");
 
@@ -19,10 +26,12 @@ const PORT = process.env.PORT || 4000;
 // bouton pour que ça tourne, c'est ce cycle automatique qui alimente la file "à vérifier".
 async function cycleAutomatique() {
   try {
-    const { ajoutees, examinees } = await rechercherNouvellesOpportunites(pool);
+    const { ajoutees, publiees, examinees } = await rechercherNouvellesOpportunites(pool);
     if (examinees) {
-      console.log(`Recherche IA automatique : ${ajoutees}/${examinees} proposition(s) ajoutée(s) à vérifier.`);
+      console.log(`Recherche IA automatique : ${ajoutees}/${examinees} proposition(s) ajoutée(s), dont ${publiees} publiée(s) après vérification de la source.`);
     }
+    const reprises = await verifierEnAttente(pool);
+    if (reprises) console.log(`${reprises} proposition(s) en attente publiée(s) après vérification de la source.`);
   } catch (err) {
     console.error("Erreur recherche IA automatique:", err);
   }
@@ -44,7 +53,13 @@ async function cycleAutomatique() {
   }
 }
 
-Promise.all([initializeQuestionsTable(), initializeAdminTable(), initializeNewsletterTable()])
+Promise.all([
+  initializeQuestionsTable(),
+  initializeAdminTable(),
+  initializeNewsletterTable(),
+  initializeOpportuniteColumns(),
+  initializeCompteTables(),
+])
   .then(() => {
     app.listen(PORT, () => console.log(`Backend Yeelen sur http://localhost:${PORT}`));
 

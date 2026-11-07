@@ -18,6 +18,7 @@ const createQuestionsRouter = require("./questionsRoutes");
 const createAdminRouter = require("./adminRoutes");
 const createRechercheIaRouter = require("./rechercheIaRoutes");
 const createAdminOpportunitesRouter = require("./adminOpportunitesRoutes");
+const createCompteRouter = require("./compteRoutes");
 
 // `pool` est injecté plutôt qu'importé directement : les tests peuvent ainsi
 // construire l'app avec un pool factice, sans dépendre d'un vrai serveur MySQL.
@@ -193,6 +194,7 @@ function createApp({ pool, sessionStore }) {
   app.use("/api/faq", faqRoutes);
   app.use("/api", contenuRoutes);
   app.use("/api/newsletter", createNewsletterRouter(pool));
+  app.use("/api/compte", createCompteRouter(pool));
   app.use("/api/questions", createQuestionsRouter(pool));
   app.use("/api/admin/opportunites", createAdminOpportunitesRouter(pool));
   app.use("/api/admin", createAdminRouter(pool));

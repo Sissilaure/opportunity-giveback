@@ -116,3 +116,48 @@ export async function adminSupprimerOpportunite(id) {
 export async function adminLancerRechercheIA() {
   return request("/api/admin/opportunites/rechercher-ia", { method: "POST" });
 }
+
+// ---------- Comptes utilisateurs, suivi de candidatures, notifications ----------
+export async function compteMoi() {
+  return request("/api/compte/moi");
+}
+
+export async function compteInscription({ email, motDePasse, prenom }) {
+  return request("/api/compte/inscription", { method: "POST", body: JSON.stringify({ email, motDePasse, prenom }) });
+}
+
+export async function compteConnexion({ email, motDePasse }) {
+  return request("/api/compte/connexion", { method: "POST", body: JSON.stringify({ email, motDePasse }) });
+}
+
+export async function compteDeconnexion() {
+  return request("/api/compte/deconnexion", { method: "POST" });
+}
+
+export async function compteSupprimer(motDePasse) {
+  return request("/api/compte/moi", { method: "DELETE", body: JSON.stringify({ motDePasse }) });
+}
+
+export async function fetchSuiviCompte() {
+  return request("/api/compte/suivi");
+}
+
+export async function enregistrerSuiviCompte(id, changements) {
+  return request(`/api/compte/suivi/${id}`, { method: "PUT", body: JSON.stringify(changements) });
+}
+
+export async function retirerSuiviCompte(id) {
+  return request(`/api/compte/suivi/${id}`, { method: "DELETE" });
+}
+
+export async function importerSuiviCompte(ids) {
+  return request("/api/compte/suivi/importer", { method: "POST", body: JSON.stringify({ ids }) });
+}
+
+export async function fetchNotifications() {
+  return request("/api/compte/notifications");
+}
+
+export async function marquerNotificationsLues(cles) {
+  return request("/api/compte/notifications/lues", { method: "POST", body: JSON.stringify({ cles }) });
+}

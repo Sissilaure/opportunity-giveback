@@ -170,6 +170,30 @@ Les sessions de connexion sont stockées dans la table MySQL `sessions` (voir
 `backend/sessionStore.js`), pas en mémoire — un redémarrage du serveur (courant sur un
 hébergement gratuit qui se met en veille) ne déconnecte donc pas l'équipe.
 
+## Comptes, suivi et notifications
+
+- **Compte facultatif** : email + mot de passe (≥ 10 caractères, haché bcrypt coût 12), session de 30 jours. Aucun email
+  n'est envoyé : tout fonctionne sans service d'envoi. Pas de « mot de passe oublié » automatique pour l'instant (il
+  nécessiterait l'envoi d'emails) : l'utilisateur écrit depuis la page Aide.
+- **Suivi de candidatures** : à faire, en cours, dossier envoyé, acceptée, refusée, plus une note. Le suivi gardé sur
+  l'appareil avant la création du compte est repris automatiquement.
+- **Notifications dans l'application** (cloche) : rappels à 7, 3 et 1 jour de la date limite, échéance dépassée, et
+  nouveautés de la semaine. Elles sont calculées à la demande, sans tâche planifiée à faire tourner. Une candidature
+  déjà envoyée n'est plus rappelée.
+- **Données** : tables `utilisateur`, `suivi_candidature`, `notification_lue` (créées au démarrage). Le compte se supprime
+  depuis « Mon suivi » (confirmation par mot de passe) et efface toutes ses données.
+- **API** : `/api/compte/{inscription,connexion,deconnexion,moi}`, `/api/compte/suivi`, `/api/compte/notifications`.
+
+## Publication automatique des opportunités
+
+La recherche IA (chaque jour à 6 h UTC et au démarrage) propose des pistes. Pour chacune, le serveur **lit la page
+officielle** (`safeFetch.js`, protégé contre le SSRF : adresses internes, redirections, taille et délai bornés) et vérifie
+que le programme et l'organisme y figurent (`verification.js`). Si oui, la fiche est **publiée directement**, avec
+l'image d'aperçu de l'organisme (balise Open Graph, https uniquement) et la mention « Source officielle vérifiée » :
+elle n'est pas présentée comme relue par un humain. Sinon elle reste « à vérifier » et est retentée chaque jour.
+`AUTO_PUBLISH=false` rétablit la validation humaine systématique. Les colonnes `image_url` et `verification_auto` sont
+ajoutées toutes seules à la table `opportunite`.
+
 ## Sécurité
 
 Mesures en place (et testées dans `backend/tests/api.test.js`) :

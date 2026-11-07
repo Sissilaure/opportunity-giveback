@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import TypeBadge from "./TypeBadge";
 import EcheanceBadge from "./EcheanceBadge";
 import VerifiedBadge from "./VerifiedBadge";
-import { TYPE_STYLES, imageOpportunite } from "../lib/types";
+import OpportuniteImage from "./OpportuniteImage";
+import { TYPE_STYLES } from "../lib/types";
 
 export default function OpportuniteCard({ opportunite }) {
   const style = TYPE_STYLES[opportunite.type];
@@ -12,12 +13,8 @@ export default function OpportuniteCard({ opportunite }) {
       className="group relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
     >
       <div className="photo-chaude relative aspect-[16/9] overflow-hidden bg-primary-light">
-        <img
-          src={imageOpportunite(opportunite)}
-          alt=""
-          loading="lazy"
-          width="1000"
-          height="563"
+        <OpportuniteImage
+          opportunite={opportunite}
           className="h-full w-full object-cover saturate-75 transition-transform duration-700 ease-out group-hover:scale-105"
         />
         <div className="absolute left-3 top-3">
@@ -34,7 +31,7 @@ export default function OpportuniteCard({ opportunite }) {
         <p className="mt-0.5 text-sm text-muted">{opportunite.organisme}</p>
 
         <div className="mt-auto flex flex-wrap gap-2 pt-3">
-          <VerifiedBadge date={opportunite.dateVerification} />
+          <VerifiedBadge date={opportunite.dateVerification} auto={opportunite.verificationAuto} />
           <EcheanceBadge
             statutEcheance={opportunite.statutEcheance}
             joursRestants={opportunite.joursRestants}

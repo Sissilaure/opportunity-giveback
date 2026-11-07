@@ -18,6 +18,10 @@ export default function Confidentialite() {
             fréquence choisie.
           </li>
           <li>
+            <strong>Votre compte</strong>, si vous en créez un : email, prénom (facultatif), mot de passe chiffré (nous ne le
+            connaissons jamais) et la liste des opportunités que vous suivez, avec l'avancée de vos candidatures.
+          </li>
+          <li>
             <strong>Le texte de vos questions</strong> envoyées à l'équipe. N'y mettez pas d'informations
             personnelles : une fois répondues, elles peuvent apparaître dans la FAQ de la communauté.
           </li>
@@ -25,7 +29,7 @@ export default function Confidentialite() {
 
         <h2>Ce que nous ne faisons pas</h2>
         <ul>
-          <li>Aucun compte n'est nécessaire pour consulter les opportunités et les ressources.</li>
+          <li>Aucun compte n'est nécessaire pour consulter les opportunités et les ressources : il sert seulement au suivi et aux rappels.</li>
           <li>Aucune donnée n'est vendue ni transmise à des tiers.</li>
         </ul>
 
