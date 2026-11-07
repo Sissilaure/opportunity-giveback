@@ -1,3 +1,4 @@
+require("./zodFr");
 const { AppError } = require("./errors");
 
 // Valide req[source] avec un schema zod, remplace req[source] par la valeur normalisée

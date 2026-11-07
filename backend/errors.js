@@ -18,6 +18,13 @@ function errorHandler(err, req, res, next) {
   if (err instanceof AppError) {
     return res.status(err.status).json({ error: err.message });
   }
+  // Erreurs du lecteur JSON (express.json) : la faute vient du client, pas du serveur → 4xx lisible, pas 500.
+  if (err.type === "entity.parse.failed") {
+    return res.status(400).json({ error: "Requête illisible : le corps n'est pas un JSON valide." });
+  }
+  if (err.type === "entity.too.large") {
+    return res.status(413).json({ error: "Requête trop volumineuse." });
+  }
   console.error(err);
   res.status(500).json({ error: "Une erreur interne est survenue." });
 }

@@ -29,7 +29,9 @@ export default function RessourceDetail() {
   useEffect(() => {
     fetchRessource(id)
       .then(setRessource)
-      .catch(() => setErreur("Ressource introuvable."))
+      .catch((err) =>
+        setErreur(err.status === 404 || err.status === 400 ? "Ressource introuvable." : "Impossible de charger cette ressource. Vérifiez votre connexion et réessayez."),
+      )
       .finally(() => setChargement(false));
   }, [id]);
 
@@ -39,12 +41,12 @@ export default function RessourceDetail() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <Link to="/ressources" className="inline-flex items-center gap-1 text-sm font-medium text-ink">
+      <Link to="/ressources" className="-ml-1 inline-flex items-center gap-1 py-2 pr-3 text-sm font-medium text-ink hover:text-primary">
         <ChevronLeftIcon className="h-4 w-4" /> Ressources
       </Link>
 
       {chargement && <p className="mt-6 text-sm text-muted">Chargement…</p>}
-      {erreur && <p className="mt-6 text-sm text-danger">{erreur}</p>}
+      {erreur && <p role="alert" className="mt-6 text-sm text-danger">{erreur}</p>}
 
       {ressource && (
         <>

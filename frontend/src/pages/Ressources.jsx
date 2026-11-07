@@ -26,7 +26,7 @@ export default function Ressources() {
 
   return (
     <main className="mx-auto max-w-6xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Ressources</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Se préparer</p>
       <h1 className="mt-1 font-display text-4xl tracking-tight text-ink sm:text-5xl">Ressources</h1>
       <p className="mt-1 font-serif text-xl italic text-muted">Guides, modèles et réponses</p>
 
@@ -41,7 +41,7 @@ export default function Ressources() {
 
       {ressources.length > 0 && (
         <>
-          <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted">À consulter</p>
+          <h2 className="mt-5 font-sans text-xs font-semibold uppercase tracking-wide text-muted">À consulter</h2>
           <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {ressources.map((r, i) => (
               <Link

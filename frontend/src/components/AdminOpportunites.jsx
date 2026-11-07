@@ -30,6 +30,7 @@ export default function AdminOpportunites() {
   const [actionEnCours, setActionEnCours] = useState({});
   const [rechercheEnCours, setRechercheEnCours] = useState(false);
   const [rechercheMessage, setRechercheMessage] = useState("");
+  const [erreurAction, setErreurAction] = useState("");
 
   const [formVisible, setFormVisible] = useState(false);
   const [form, setForm] = useState(FORMULAIRE_VIDE);
@@ -46,24 +47,28 @@ export default function AdminOpportunites() {
   useEffect(chargerAVerifier, []);
 
   async function handleApprouver(id) {
+    setErreurAction("");
     setActionEnCours((s) => ({ ...s, [id]: true }));
     try {
       await adminApprouverOpportunite(id);
       chargerAVerifier();
     } catch (err) {
-      alert(err.message);
+      setErreurAction(err.message);
     } finally {
       setActionEnCours((s) => ({ ...s, [id]: false }));
     }
   }
 
   async function handleRejeter(id) {
+    // Suppression définitive : on demande confirmation (un clic malheureux sur mobile suffisait à tout perdre).
+    if (!window.confirm("Rejeter et supprimer définitivement cette piste ?")) return;
+    setErreurAction("");
     setActionEnCours((s) => ({ ...s, [id]: true }));
     try {
       await adminSupprimerOpportunite(id);
       chargerAVerifier();
     } catch (err) {
-      alert(err.message);
+      setErreurAction(err.message);
     } finally {
       setActionEnCours((s) => ({ ...s, [id]: false }));
     }
@@ -98,6 +103,7 @@ export default function AdminOpportunites() {
       await adminCreerOpportunite(form);
       setForm(FORMULAIRE_VIDE);
       setFormVisible(false);
+      setRechercheMessage("Opportunité ajoutée au répertoire.");
     } catch (err) {
       setErreurForm(err.message);
     } finally {
@@ -136,7 +142,16 @@ export default function AdminOpportunites() {
         </div>
       </div>
 
-      {rechercheMessage && <p className="mt-3 text-sm text-muted">{rechercheMessage}</p>}
+      {rechercheMessage && (
+        <p role="status" className="mt-3 text-sm text-muted">
+          {rechercheMessage}
+        </p>
+      )}
+      {erreurAction && (
+        <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">
+          {erreurAction}
+        </p>
+      )}
 
       {formVisible && (
         <div className="mt-4 rounded-card border border-line bg-surface p-5 shadow-card">

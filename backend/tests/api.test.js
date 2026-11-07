@@ -421,4 +421,29 @@ describe("Sécurité", () => {
     // Réponse petite : pas forcément compressée, mais l'en-tête Vary prouve que la négociation est active.
     expect(res.headers["vary"]).toMatch(/Accept-Encoding/i);
   });
+
+  it("répond 400 (pas 500) à un JSON mal formé", async () => {
+    const res = await request(app).post("/api/questions").set("Content-Type", "application/json").send("{bad");
+    expect(res.status).toBe(400);
+    expect(res.body.error).toMatch(/JSON/);
+  });
+
+  it("répond 413 à un corps trop volumineux", async () => {
+    const res = await request(app).post("/api/questions").send({ texte: "x".repeat(30000) });
+    expect(res.status).toBe(413);
+  });
+
+  it("renvoie des messages de validation en français, jamais ceux de zod", async () => {
+    const reponses = await Promise.all([
+      request(app).get("/api/opportunites?type=nimportequoi"),
+      request(app).get("/api/opportunites?q=" + "a".repeat(300)),
+      request(app).get("/api/opportunites?page=0"),
+      request(app).post("/api/newsletter").send({ email: "a@b.org", frequence: "chaque-jour" }),
+      request(app).post("/api/newsletter").send({}),
+    ]);
+    for (const r of reponses) {
+      expect(r.status).toBe(400);
+      expect(r.body.error).not.toMatch(/Invalid|Required|String must|Number must|Expected/);
+    }
+  });
 });

@@ -41,7 +41,7 @@ export default function RechercheIA() {
         <p className="text-xs font-bold uppercase tracking-widest text-ink">Recherche intelligente · bêta</p>
         <h2 className="mt-1 font-display text-xl text-ink">Décrivez votre situation</h2>
         <p className="mt-1 text-sm text-muted">
-          Ex. « Je suis en Master 1, ressortissant d'Afrique subsaharienne, je cherche une bourse pour l'Europe. »
+          Ex. « Je suis en Master 1, originaire d'Afrique subsaharienne, je cherche une bourse pour l'Europe. »
         </p>
         <p className="mt-2 text-xs text-muted">
           L'IA peut se tromper : ses suggestions sont à vérifier. Consultez toujours la source officielle de chaque fiche avant de candidater.

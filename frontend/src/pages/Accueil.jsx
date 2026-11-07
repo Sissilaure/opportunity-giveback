@@ -146,7 +146,7 @@ export default function Accueil() {
             {stats && (
               <div className="animate-fade-up mx-auto mt-12 grid max-w-md grid-cols-2 gap-6 border-t border-line pt-8 text-left lg:mx-0" style={{ "--delay": "400ms" }}>
                 <Statistique valeur={stats.total} libelle="opportunités vérifiées et ouvertes" />
-                <Statistique valeur={stats.organismes} libelle="organismes partenaires" />
+                <Statistique valeur={stats.organismes} libelle="organismes référencés" />
               </div>
             )}
           </div>
@@ -243,7 +243,7 @@ export default function Accueil() {
         <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
           <SectionTitre
             surtitre="Pourquoi Yeelen"
-            titre="L'information, ce n'est pas assez. Il faut la comprendre."
+            titre="L'information ne suffit pas. Il faut la comprendre."
             texte="Savoir qu'une bourse existe ne suffit pas : il faut savoir qui peut postuler, quoi fournir et quand."
           />
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">

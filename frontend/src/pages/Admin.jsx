@@ -3,8 +3,19 @@ import { Link } from "react-router-dom";
 import { adminSession, adminLogin, adminLogout, adminFetchQuestions, adminRepondreQuestion } from "../lib/api";
 import AdminOpportunites from "../components/AdminOpportunites";
 import { ChevronLeftIcon } from "../components/icons";
+import useTitre from "../hooks/useTitre";
 
 export default function Admin() {
+  useTitre("Espace équipe");
+  // Page interne : on demande aux moteurs de recherche de ne pas l'indexer.
+  useEffect(() => {
+    const meta = document.createElement("meta");
+    meta.name = "robots";
+    meta.content = "noindex, nofollow";
+    document.head.appendChild(meta);
+    return () => meta.remove();
+  }, []);
+  const [erreurAction, setErreurAction] = useState("");
   const [verification, setVerification] = useState(true);
   const [estConnecte, setEstConnecte] = useState(false);
   const [email, setEmail] = useState("");
@@ -21,6 +32,7 @@ export default function Admin() {
         setEstConnecte(isAdmin);
         if (isAdmin) chargerQuestions();
       })
+      .catch(() => {})
       .finally(() => setVerification(false));
   }, []);
 
@@ -43,7 +55,11 @@ export default function Admin() {
   }
 
   async function handleDeconnexion() {
-    await adminLogout();
+    try {
+      await adminLogout();
+    } catch {
+      /* la session expirera d'elle-même ; on referme quand même l'écran */
+    }
     setEstConnecte(false);
     setQuestions([]);
   }
@@ -51,13 +67,14 @@ export default function Admin() {
   async function handleRepondre(id) {
     const reponse = (brouillons[id] || "").trim();
     if (!reponse) return;
+    setErreurAction("");
     setEnvoiEnCours((s) => ({ ...s, [id]: true }));
     try {
       await adminRepondreQuestion(id, reponse);
       chargerQuestions();
       setBrouillons((b) => ({ ...b, [id]: "" }));
     } catch (err) {
-      alert(err.message);
+      setErreurAction(err.message);
     } finally {
       setEnvoiEnCours((s) => ({ ...s, [id]: false }));
     }
@@ -71,7 +88,7 @@ export default function Admin() {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-glow px-5">
         <div className="w-full max-w-md">
-          <Link to="/" className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-ink hover:text-primary">
+          <Link to="/" className="mb-2 inline-flex items-center gap-1 py-2 pr-3 text-sm font-medium text-ink hover:text-primary">
             <ChevronLeftIcon className="h-4 w-4" /> Accueil
           </Link>
         </div>
@@ -86,7 +103,9 @@ export default function Admin() {
             onChange={(e) => setEmail(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleConnexion()}
             placeholder="Email"
+            aria-label="Email"
             autoComplete="username"
+            inputMode="email"
             className="mt-5 w-full rounded-lg border border-line bg-canvas p-3 text-sm text-ink focus:border-primary focus:outline-none"
           />
           <input
@@ -95,6 +114,7 @@ export default function Admin() {
             onChange={(e) => setMotDePasse(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleConnexion()}
             placeholder="Mot de passe"
+            aria-label="Mot de passe"
             autoComplete="current-password"
             className="mt-3 w-full rounded-lg border border-line bg-canvas p-3 text-sm text-ink focus:border-primary focus:outline-none"
           />
@@ -105,7 +125,7 @@ export default function Admin() {
           >
             {connexionEnCours ? "Connexion…" : "Se connecter"}
           </button>
-          {erreurConnexion && <p className="mt-3 text-sm text-danger">{erreurConnexion}</p>}
+          {erreurConnexion && <p role="alert" className="mt-3 text-sm text-danger">{erreurConnexion}</p>}
         </div>
       </main>
     );
@@ -130,6 +150,12 @@ export default function Admin() {
         <h1 className="mt-1 font-display text-2xl text-ink">Questions reçues</h1>
       </div>
 
+      {erreurAction && (
+        <p role="alert" className="mt-4 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">
+          {erreurAction}
+        </p>
+      )}
+
       <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-muted">
         En attente ({enAttente.length})
       </p>
@@ -143,6 +169,7 @@ export default function Admin() {
               value={brouillons[q.id] || ""}
               onChange={(e) => setBrouillons((b) => ({ ...b, [q.id]: e.target.value }))}
               placeholder="Votre réponse…"
+              aria-label="Votre réponse"
               rows={2}
               className="mt-3 w-full rounded-lg border border-line bg-canvas p-2 text-sm text-ink focus:border-primary focus:outline-none"
             />

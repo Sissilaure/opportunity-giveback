@@ -10,15 +10,33 @@ export default function Suivi() {
   useTitre("Mon suivi");
   const [opportunites, setOpportunites] = useState([]);
   const [chargement, setChargement] = useState(true);
+  const [probleme, setProbleme] = useState(false);
+  const [tentative, setTentative] = useState(0);
 
   useEffect(() => {
+    let actuel = true;
     const ids = getSuivi();
     Promise.allSettled(ids.map((id) => fetchOpportunite(id))).then((resultats) => {
-      // Une opportunité archivée ou supprimée depuis n'existe plus : on l'ignore silencieusement.
+      if (!actuel) return;
+      // 404 = archivée ou supprimée depuis : on l'oublie. Toute autre erreur (réseau, serveur) : on garde l'identifiant
+      // et on le dit, sinon la personne croirait avoir perdu son suivi.
+      const disparues = [];
+      let injoignable = false;
+      resultats.forEach((r, i) => {
+        if (r.status === "rejected") {
+          if (r.reason?.status === 404) disparues.push(ids[i]);
+          else injoignable = true;
+        }
+      });
+      disparues.forEach((id) => toggleSuivi(id));
       setOpportunites(resultats.filter((r) => r.status === "fulfilled").map((r) => r.value));
+      setProbleme(injoignable);
       setChargement(false);
     });
-  }, []);
+    return () => {
+      actuel = false;
+    };
+  }, [tentative]);
 
   function retirer(id) {
     toggleSuivi(id);
@@ -44,7 +62,22 @@ export default function Suivi() {
         </div>
       )}
 
-      {!chargement && opportunites.length === 0 && (
+      {!chargement && probleme && (
+        <div role="alert" className="mt-8 flex flex-col gap-3 rounded-lg bg-danger-bg px-4 py-3 text-sm font-medium text-danger sm:flex-row sm:items-center sm:justify-between">
+          <span>Impossible de charger certaines opportunités. Votre suivi est conservé : vérifiez votre connexion.</span>
+          <button
+            onClick={() => {
+              setChargement(true);
+              setTentative((n) => n + 1);
+            }}
+            className="min-h-[40px] rounded-lg bg-danger px-4 py-2 font-semibold text-white"
+          >
+            Réessayer
+          </button>
+        </div>
+      )}
+
+      {!chargement && !probleme && opportunites.length === 0 && (
         <div className="animate-fade-up mt-10 rounded-card border border-dashed border-line bg-surface p-10 text-center">
           <p className="font-serif text-2xl text-ink">Rien dans votre suivi pour l'instant</p>
           <p className="mt-1 text-sm text-muted">
@@ -65,7 +98,7 @@ export default function Suivi() {
             <OpportuniteCard opportunite={opp} />
             <button
               onClick={() => retirer(opp.id)}
-              className="self-start text-xs font-medium text-muted underline-offset-2 hover:text-danger hover:underline"
+              className="self-start py-2 text-sm font-medium text-muted underline-offset-2 hover:text-danger hover:underline"
             >
               Retirer de mon suivi
             </button>

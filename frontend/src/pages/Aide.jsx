@@ -20,7 +20,10 @@ export default function Aide() {
     }
 
     chargerQuestionsRepondues();
-    const intervalle = window.setInterval(chargerQuestionsRepondues, 10000);
+    // Rafraîchit les réponses de la communauté, mais pas toutes les 10 s en tâche de fond (batterie, forfait data).
+    const intervalle = window.setInterval(() => {
+      if (document.visibilityState === "visible") chargerQuestionsRepondues();
+    }, 30000);
     return () => window.clearInterval(intervalle);
   }, []);
 
@@ -44,13 +47,13 @@ export default function Aide() {
 
   return (
     <main className="mx-auto max-w-2xl px-5 pb-12 pt-6 sm:px-8 sm:pt-10">
-      <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Aide</p>
+      <p className="text-xs font-bold uppercase tracking-widest text-accent-dark">Besoin d'aide ?</p>
       <h1 className="mt-1 font-display text-4xl tracking-tight text-ink sm:text-5xl">Aide</h1>
       <p className="mt-1 font-serif text-xl italic text-muted">Une question ? Un blocage ?</p>
 
       <div className="relative mt-5 overflow-hidden rounded-card bg-ink p-5 text-white shadow-card-hover">
         <div className="relative">
-          <p className="text-xs font-semibold uppercase tracking-wide text-accent-dark">Canal d'orientation</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-accent">Canal d'orientation</p>
           <h2 className="mt-1 font-display text-2xl leading-snug">Vous n'êtes pas seul·e dans vos démarches</h2>
           <p className="mt-1 text-sm text-white/80">
             Posez une question, elle sera lue par un membre de l'équipe et vous orientera.
@@ -68,7 +71,8 @@ export default function Aide() {
                 <div key={item.id}>
                   <button
                     onClick={() => setOpenFaqId(isOpen ? null : item.id)}
-                    className="flex w-full items-center justify-between gap-4 py-3 text-left text-sm font-medium text-ink"
+                    aria-expanded={isOpen}
+                    className="flex min-h-[44px] w-full items-center justify-between gap-4 py-3 text-left text-sm font-medium text-ink"
                   >
                     <span>{item.question}</span>
                     <ChevronDownIcon
@@ -106,6 +110,8 @@ export default function Aide() {
           onChange={(e) => setTexte(e.target.value)}
           placeholder="Écrivez votre question ici…"
           rows={4}
+          maxLength={2000}
+          aria-label="Votre question"
           className="mt-3 w-full rounded-lg border border-line bg-canvas p-3 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none"
         />
         <button
@@ -117,12 +123,12 @@ export default function Aide() {
         </button>
 
         {statut === "sent" && (
-          <p className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-sm text-success">
+          <p role="status" className="mt-3 rounded-lg bg-success-bg px-3 py-2 text-sm text-success">
             Question envoyée. Une personne de l'équipe y répondra prochainement.
           </p>
         )}
         {statut === "error" && (
-          <p className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{erreurMessage}</p>
+          <p role="alert" className="mt-3 rounded-lg bg-danger-bg px-3 py-2 text-sm text-danger">{erreurMessage}</p>
         )}
       </div>
     </main>
