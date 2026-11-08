@@ -1,0 +1,12 @@
+[
+  {
+    "id": "faq-1",
+    "question": "La plateforme garantit-elle une réponse positive ?",
+    "reponse": "Non. La plateforme centralise et vérifie les opportunités, mais ne décide pas des admissions ou des attributions de bourses. Elle vous aide à préparer un dossier solide et à ne pas passer à côté d'une échéance."
+  },
+  {
+    "id": "faq-2",
+    "question": "Comment sont vérifiées les opportunités ?",
+    "reponse": "Chaque fiche affiche sa source officielle et la date à laquelle elle a été vérifiée par l'équipe. Une opportunité n'est publiée que si sa source est identifiable et à jour."
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "eq-1",
+    "nom": "Abdoule Hafiz Soré",
+    "role": "Pôle animation numérique et community management",
+    "description": "Boursier de la Mastercard Foundation à l'institut 2iE."
+  },
+  {
+    "id": "eq-2",
+    "nom": "Gaël Nikiema",
+    "role": "Développeur web",
+    "description": "Boursier de la Mastercard Foundation à l'institut 2iE."
+  },
+  {
+    "id": "eq-3",
+    "nom": "Safiatou Belem",
+    "role": "Pôle logistique et déploiement terrain",
+    "description": "Conseille les candidats sur les pièces à fournir, les lettres de motivation et le calendrier."
+  },
+  {
+    "id": "eq-4",
+    "nom": "Yasmine Alassani",
+    "role": "Chargée de la recherche des opportunités",
+    "description": "Repère et qualifie les nouvelles bourses, stages et concours."
+  },
+  {
+    "id": "eq-5",
+    "nom": "Adiaratou Coulibaly",
+    "role": "Chargée de la recherche des opportunités",
+    "description": "Tisse des relations avec les universités, fondations et institutions qui publient leurs bourses."
+  },
+  {
+    "id": "eq-6",
+    "nom": "D'aisth Ondongo",
+    "role": "Pôle veille et recherche d'informations",
+    "description": "Chargée de la recherche des opportunités."
+  },
+  {
+    "id": "eq-7",
+    "nom": "Sylviane Yameogo",
+    "role": "Développement de l'application",
+    "description": "Conçoit et développe la plateforme Yeelen."
+  },
+  {
+    "id": "eq-8",
+    "nom": "Ilona Temgoua",
+    "role": "Développement de l'application",
+    "description": "Conçoit et développe la plateforme Yeelen."
+  }
+]

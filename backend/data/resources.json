@@ -1,0 +1,30 @@
+[
+  {
+    "id": "cv-bachelier",
+    "type": "cv",
+    "titre": "Modèle de CV pour bachelier",
+    "description": "Une trame simple pour un premier dossier.",
+    "contenu": "## Structure recommandée\n\n1. **Informations personnelles** : nom, contact, ville\n2. **Formation** : diplôme obtenu, mention, établissement\n3. **Expériences** : stages, projets scolaires, engagement associatif\n4. **Compétences** : langues, outils, savoir-être\n5. **Centres d'intérêt** : courts, pertinents\n\n## Exemple concret pour la rubrique \"Expériences\"\n\n> **Stage d'observation, Clinique Saint-Joseph (2 semaines, 2025).** Observation du service d'accueil, prise de notes lors des consultations, sensibilisation à la confidentialité médicale.\n\n## Erreurs fréquentes à éviter\n\n- Un CV de plus d'une page pour un premier dossier\n- Des dates floues (\"2024\" au lieu de \"mars-avril 2024\")\n- Une adresse email peu sérieuse pour candidater\n- Copier la structure sans l'adapter à l'opportunité visée\n\n> Conseil : une seule page, pas de photo obligatoire, pas de fautes."
+  },
+  {
+    "id": "lettre-motivation",
+    "type": "lettre",
+    "titre": "Rédiger une lettre de motivation",
+    "description": "Guide pas à pas avec exemples.",
+    "contenu": "## Les 3 paragraphes essentiels\n\n1. **Pourquoi cette opportunité** : montrez que vous avez lu les critères\n2. **Pourquoi vous** : un exemple concret, pas une liste de qualités\n3. **Ce que vous en ferez** : un objectif clair et réaliste\n\n## Exemple de phrase d'accroche\n\n> \"Actuellement en dernière année de Licence en gestion, j'ai découvert ce programme grâce à mon professeur d'économie, et ses critères correspondent exactement à mon projet de spécialisation en finance du développement.\"\n\n## Ce qui affaiblit une lettre\n\n- Commencer par \"Je me permets de vous écrire...\"\n- Une liste de qualités sans preuve (\"je suis rigoureux, motivé...\")\n- Recopier mot pour mot la description de l'opportunité\n- Une lettre générique envoyée à plusieurs organismes sans adaptation\n\n> Conseil : évitez les formules toutes faites, restez sous une page."
+  },
+  {
+    "id": "source-fiable",
+    "type": "vigilance",
+    "titre": "Reconnaître une source fiable",
+    "description": "Les signes d'une annonce trompeuse.",
+    "contenu": "## Signaux d'alerte\n\n- Une bourse qui demande de l'argent pour candidater\n- Aucune source officielle ni organisme identifiable\n- Une échéance anormalement courte pour créer l'urgence\n- Des fautes ou une mise en page peu professionnelle\n- Un contact uniquement par réseaux sociaux ou messagerie privée\n- Une promesse de résultat garanti (\"100% d'acceptation\")\n\n## Comment vérifier en 2 minutes\n\n1. Chercher le nom exact de l'organisme sur un moteur de recherche\n2. Comparer l'URL de l'annonce avec le site officiel de l'organisme\n3. Vérifier que la date de l'annonce est cohérente avec le cycle habituel du programme\n\n> Réflexe : cherchez toujours le nom de l'organisme sur son site officiel, jamais uniquement sur l'annonce elle-même."
+  },
+  {
+    "id": "checklist-dossier",
+    "type": "checklist",
+    "titre": "Check-list du dossier complet",
+    "description": "Les pièces à réunir avant l'envoi.",
+    "contenu": "## À vérifier avant d'envoyer\n\n- [ ] CV à jour\n- [ ] Lettre de motivation relue par une autre personne\n- [ ] Copies des diplômes et relevés de notes\n- [ ] Pièce d'identité\n- [ ] Lettres de référence si demandées\n- [ ] Respect du format demandé (PDF, taille max)\n- [ ] Nom des fichiers clair (ex. Dupont_Marie_CV.pdf)\n\n> Astuce : préparez ces pièces une seule fois, dans un dossier dédié. Vous gagnerez un temps précieux pour chaque nouvelle candidature."
+  }
+]
