@@ -105,6 +105,10 @@ export async function adminCreerOpportunite(payload) {
   return request("/api/admin/opportunites", { method: "POST", body: JSON.stringify(payload) });
 }
 
+export async function adminImporterOpportunites(lignes, mode) {
+  return request("/api/admin/opportunites/importer", { method: "POST", body: JSON.stringify({ lignes, mode }) });
+}
+
 export async function adminApprouverOpportunite(id) {
   return request(`/api/admin/opportunites/${id}/approuver`, { method: "POST" });
 }

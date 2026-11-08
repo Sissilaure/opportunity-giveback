@@ -196,6 +196,18 @@ elle n'est pas présentée comme relue par un humain. Sinon elle reste « à vé
 `AUTO_PUBLISH=false` rétablit la validation humaine systématique. Les colonnes `image_url` et `verification_auto` sont
 ajoutées toutes seules à la table `opportunite`.
 
+## Import en lot (espace équipe)
+
+Dans `/admin`, le bouton **« Importer plusieurs opportunités »** permet d'ajouter jusqu'à 100 opportunités d'un coup : on
+colle un tableau (Excel, Google Sheets) ou on choisit un fichier CSV, avec un modèle à télécharger. Colonnes obligatoires :
+`titre`, `type`, `organisme`, `lien_source` ; facultatives : `site_web`, `public`, `criteres`, `pieces`, `date_limite`
+(plusieurs critères ou pièces séparés par « | »). L'aperçu valide chaque ligne avant l'envoi (type, lien http(s), date
+`JJ/MM/AAAA` ou `AAAA-MM-JJ`). Au choix : **publier tout de suite** (l'équipe a vérifié) ou **mettre en attente** (la lecture
+automatique du site officiel pourra publier ensuite). Le serveur revalide chaque ligne, écarte les doublons (même titre,
+accents et majuscules ignorés, aussi à l'intérieur du fichier) et rend compte ligne par ligne. Les images d'aperçu des
+organismes sont récupérées en arrière-plan, sans faire attendre. Route : `POST /api/admin/opportunites/importer`
+(session équipe obligatoire, 10 imports par 10 minutes ; seule route de l'API qui accepte un corps de plus de 20 Ko).
+
 ## Sécurité
 
 Mesures en place (et testées dans `backend/tests/api.test.js`) :

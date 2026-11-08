@@ -19,12 +19,13 @@ const createAdminRouter = require("./adminRoutes");
 const createRechercheIaRouter = require("./rechercheIaRoutes");
 const createAdminOpportunitesRouter = require("./adminOpportunitesRoutes");
 const createCompteRouter = require("./compteRoutes");
+const requireAdmin = require("./requireAdmin");
 
 // `pool` est injecté plutôt qu'importé directement : les tests peuvent ainsi
 // construire l'app avec un pool factice, sans dépendre d'un vrai serveur MySQL.
 // `sessionStore` est optionnel : sans lui (comme dans les tests), express-session
 // retombe sur son MemoryStore par défaut, sans jamais toucher au pool factice.
-function createApp({ pool, sessionStore }) {
+function createApp({ pool, sessionStore, enrichirImages }) {
   const app = express();
   app.set("trust proxy", 1);
 
@@ -53,7 +54,11 @@ function createApp({ pool, sessionStore }) {
   app.use(cors({ origin: allowedOrigin, credentials: true }));
   // JSON compressé : gain net sur les connexions mobiles lentes.
   app.use(compression());
-  app.use(express.json({ limit: "20kb" }));
+  // 20 Ko pour toute l'API, sauf l'import en lot de l'équipe (jusqu'à 100 lignes) : celui-là a une limite plus large,
+  // appliquée seulement APRÈS vérification de la session (un visiteur anonyme ne peut pas faire lire 300 Ko).
+  const CHEMIN_IMPORT = "/api/admin/opportunites/importer";
+  const jsonPetit = express.json({ limit: "20kb" });
+  app.use((req, res, next) => (req.path === CHEMIN_IMPORT ? next() : jsonPetit(req, res, next)));
   app.use(createOriginGuard(allowedOrigin));
   app.use(
     "/api",
@@ -196,7 +201,8 @@ function createApp({ pool, sessionStore }) {
   app.use("/api/newsletter", createNewsletterRouter(pool));
   app.use("/api/compte", createCompteRouter(pool));
   app.use("/api/questions", createQuestionsRouter(pool));
-  app.use("/api/admin/opportunites", createAdminOpportunitesRouter(pool));
+  app.use(CHEMIN_IMPORT, requireAdmin, express.json({ limit: "300kb" }));
+  app.use("/api/admin/opportunites", createAdminOpportunitesRouter(pool, { enrichirImages }));
   app.use("/api/admin", createAdminRouter(pool));
 
   app.use((req, res) => res.status(404).json({ error: "Route introuvable." }));

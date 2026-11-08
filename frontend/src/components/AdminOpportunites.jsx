@@ -1,3 +1,4 @@
+import ImportOpportunites from "./ImportOpportunites";
 import { useEffect, useState } from "react";
 import {
   adminFetchOpportunites,
@@ -152,6 +153,8 @@ export default function AdminOpportunites() {
           {erreurAction}
         </p>
       )}
+
+      <ImportOpportunites onImporte={chargerAVerifier} />
 
       {formVisible && (
         <div className="mt-4 rounded-card border border-line bg-surface p-5 shadow-card">

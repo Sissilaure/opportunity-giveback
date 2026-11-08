@@ -6,6 +6,7 @@ const { AppError, asyncHandler } = require("./errors");
 const { formatOpportunite, findOrCreateStructure } = require("./opportunites");
 const { rechercherNouvellesOpportunites } = require("./discoveryIA");
 const createRateLimiter = require("./rateLimit");
+const { importSchema, importerOpportunites, enrichirImages: enrichirImagesParDefaut } = require("./importOpportunites");
 
 const STATUTS_VALIDES = ["verifiee", "a_verifier", "expiree"];
 
@@ -16,8 +17,16 @@ const rechercheLimiter = createRateLimiter({
   message: "Trop de recherches lancées, réessaie dans quelques minutes.",
 });
 
+// Un import écrit jusqu'à 100 lignes d'un coup : on borne la fréquence.
+const importLimiter = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  message: "Trop d'imports lancés, réessayez dans quelques minutes.",
+});
+
 // `pool` injecté comme les autres routeurs : testable sans base réelle.
-function createAdminOpportunitesRouter(pool) {
+// `enrichirImages` est injectable aussi : les tests ne doivent pas lire de vrais sites web.
+function createAdminOpportunitesRouter(pool, { enrichirImages = enrichirImagesParDefaut } = {}) {
   const router = express.Router();
   router.use(requireAdmin);
 
@@ -50,6 +59,15 @@ function createAdminOpportunitesRouter(pool) {
         [b.titre, b.type, idStructure, b.publicEligible, b.criteres, b.piecesRequises, b.dateEcheance, b.lienSource],
       );
       res.status(201).json({ message: "Opportunité ajoutée et publiée." });
+    }),
+  );
+
+  router.post(
+    "/importer",
+    importLimiter,
+    validate(importSchema),
+    asyncHandler(async (req, res) => {
+      res.status(201).json(await importerOpportunites(pool, req.body.lignes, req.body.mode, { enrichirImages }));
     }),
   );
 
