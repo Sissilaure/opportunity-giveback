@@ -210,6 +210,22 @@ elle n'est pas présentée comme relue par un humain. Sinon elle reste « à vé
 **Par défaut, rien n'est publié sans validation humaine** (mode prudent, annoncé par un bandeau dans `/admin`) ; la source est tout de même lue pour préparer l'image et aider la personne qui valide. Les colonnes `image_url` et `verification_auto` sont
 ajoutées toutes seules à la table `opportunite`.
 
+## Comptes de l'équipe (espace `/admin`)
+
+Chaque personne qui peut valider et publier a **son propre compte** (email + mot de passe). Depuis `backend/`, avec le `.env`
+de la base voulue :
+
+```
+node scripts/createAdmin.js premiere.personne@exemple.com    # le mot de passe est demandé ensuite, masqué
+node scripts/createAdmin.js seconde.personne@exemple.com
+node scripts/createAdmin.js --liste                          # emails des comptes existants
+node scripts/createAdmin.js --supprimer ancien@exemple.com   # le dernier compte ne peut pas être supprimé
+```
+
+Mot de passe : 12 caractères minimum (une phrase de passe convient), ni trop courant, ni contenant le début de l'email.
+Relancer la commande pour un email existant **remplace** son mot de passe. Une fois les comptes créés, retirer `ADMIN_EMAIL`
+et `ADMIN_PASSWORD` des variables du serveur : elles ne servent qu'à créer le tout premier compte d'une base vide.
+
 ## Import en lot (espace équipe)
 
 Dans `/admin`, le bouton **« Importer plusieurs opportunités »** permet d'ajouter jusqu'à 100 opportunités d'un coup : on
