@@ -193,7 +193,7 @@ scholars4dev, Opportunity Desk, Opportunities for Africans ; modifiable avec `VE
 l'IA en extrait la fiche **en français** (titre, organisme, public, critères, pièces, date limite *seulement si elle est
 écrite*) et désigne, **par son numéro** dans la liste des liens de l'article, la page officielle de l'organisme. Le serveur
 lit alors cette page officielle (`safeFetch.js` + `verification.js`) : si le programme et l'organisme y figurent, la fiche est
-**publiée directement** avec l'image de l'organisme ; sinon elle reste en attente et est retentée chaque jour. Les listes
+**publiée directement** avec l'image de l'organisme ; sinon elle reste en attente et est retentée chaque jour. Les adresses typiques des fausses bourses sont **refusées d'office** (`domaineSuspect` dans `verification.js` : http, adresse IP, noms trompeurs, liens raccourcis, hébergements gratuits, extensions à risque, y compris après redirection) : la fiche reste alors « à vérifier ». Les listes
 (« Top 10 bourses »), opportunités échues, doublons et articles sans lien officiel sont ignorés. Chaque article n'est examiné
 qu'une fois (table `veille_article`). Seuls des **faits** sont repris, jamais le texte des articles. Pourquoi des flux et pas
 « l'IA cherche sur le web » : la clé Gemini gratuite n'a pas accès à la recherche web (quota nul) ; de mémoire, l'IA se trompe

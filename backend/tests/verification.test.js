@@ -1,7 +1,7 @@
-import { describe, it, expect, afterAll, beforeAll } from "vitest";
+import { describe, it, expect, afterAll, beforeAll, vi } from "vitest";
 import http from "node:http";
 import { lireHtml, estIpPrivee } from "../safeFetch";
-import { verifierSource, extraireImage } from "../verification";
+import { verifierSource, extraireImage, domaineSuspect } from "../verification";
 
 describe("estIpPrivee", () => {
   it("reconnaît les adresses internes à ne jamais contacter", () => {
@@ -138,5 +138,44 @@ describe("verifierSource", () => {
     const autre = { url: "https://blog-quelconque.com/", status: 200, html: "<html><title>Recettes</title><body>Gâteau au chocolat</body></html>" };
     const r = await verifierSource({ ...candidat, organisme: "Fondation Tony Elumelu", titre: "Prix innovation" }, { lire: async () => autre });
     expect(r.verifiee).toBe(false);
+  });
+});
+
+describe("domaineSuspect : protection contre les fausses bourses", () => {
+  it.each([
+    ["http://www.chevening.org/", /https/],
+    ["https://185.12.9.4/bourse", /IP/],
+    ["https://xn--chvening-8za.org/", /trompeur/],
+    ["https://bit.ly/3abcdef", /raccourci/],
+    ["https://forms.gle/abc", /raccourci/],
+    ["https://bourse-chevening.blogspot.com/", /gratuitement/],
+    ["https://chevening-apply.wixsite.com/site", /gratuitement/],
+    ["https://monsite.github.io/bourse", /gratuitement/],
+    ["https://chevening-scholarship.xyz/apply", /extension/],
+    ["https://free-scholarship.top/", /extension/],
+  ])("refuse %s", (adresse, motif) => {
+    expect(domaineSuspect(adresse)).toMatch(motif);
+  });
+
+  it("laisse passer de vrais sites d'organismes, y compris sous-domaines et portails", () => {
+    for (const ok of ["https://www.chevening.org/scholarships/", "https://www.ned.org/fellowships/x", "https://applicant.mcwglobal.org/apply", "https://www.daad.de/fr/", "https://uni.edu.gh/", "https://www.2ie-edu.org/"]) {
+      expect(domaineSuspect(ok), ok).toBeNull();
+    }
+  });
+
+  it("un faux site au nom d'une vraie bourse n'est JAMAIS vérifié, même si sa page cite le bon programme", async () => {
+    const faux = { url: "https://chevening-scholarship-apply.xyz/", status: 200, html: "<html><title>Chevening Scholarships</title><body>Chevening Government of the United Kingdom scholarships</body></html>" };
+    const lire = vi.fn(async () => faux);
+    const r = await verifierSource({ ...candidat, lienSource: faux.url }, { lire });
+    expect(r.verifiee).toBe(false);
+    expect(r.raison).toMatch(/extension/);
+    expect(lire).not.toHaveBeenCalled(); // on ne va même pas lire la page
+  });
+
+  it("contrôle aussi l'adresse finale après redirection", async () => {
+    const redirigee = { ...page(), url: "https://chevening-bourses.blogspot.com/" };
+    const r = await verifierSource(candidat, { lire: async () => redirigee });
+    expect(r.verifiee).toBe(false);
+    expect(r.raison).toMatch(/après redirection/);
   });
 });
