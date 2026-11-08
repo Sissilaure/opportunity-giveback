@@ -4,9 +4,9 @@ const { TYPES_OPPORTUNITE } = require("./schemas");
 const { safeHttpUrl } = require("./security");
 const { verifierSource } = require("./verification");
 
-// Publication directe quand la source officielle a été lue et correspond ; sinon la piste reste « à vérifier ».
-// Désactivable (AUTO_PUBLISH=false) pour revenir à une validation humaine systématique.
-const autoPublier = () => process.env.AUTO_PUBLISH !== "false";
+// Publication directe quand la source officielle a été lue et correspond, SI elle est activée (AUTO_PUBLISH=true) ;
+// sinon la piste reste « à vérifier » pour une personne de l'équipe (voir publication.js).
+const { autoPublier } = require("./publication");
 
 async function verifierSansPlanter(candidat) {
   try {
@@ -83,14 +83,13 @@ async function rechercherNouvellesOpportunites(pool, { verifier = verifierSansPl
 
     const siteSur = siteWeb && siteWeb.length <= 255 ? siteWeb : null;
     const idStructure = await findOrCreateStructure(pool, organisme, siteSur);
-    const verification = autoPublier()
-      ? await verifier({ titre, organisme, lienSource, siteWeb: siteSur })
-      : { verifiee: false, imageUrl: null };
+    const verification = await verifier({ titre, organisme, lienSource, siteWeb: siteSur });
+    const publier = autoPublier() && verification.verifiee;
     await pool.query(
       `INSERT INTO opportunite
          (titre, type, id_structure, public_eligible, criteres, pieces_requises, date_echeance, lien_source,
           date_verification, statut, image_url, verification_auto)
-       VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ${verification.verifiee ? "NOW()" : "NULL"}, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, NULL, ?, ${publier ? "NOW()" : "NULL"}, ?, ?, ?)`,
       [
         titre,
         p.type,
@@ -99,13 +98,13 @@ async function rechercherNouvellesOpportunites(pool, { verifier = verifierSansPl
         Array.isArray(p.criteres) ? p.criteres.filter((c) => typeof c === "string").join("\n") : "",
         Array.isArray(p.piecesRequises) ? p.piecesRequises.filter((c) => typeof c === "string").join("\n") : "",
         lienSource,
-        verification.verifiee ? "verifiee" : "a_verifier",
+        publier ? "verifiee" : "a_verifier",
         verification.imageUrl,
-        verification.verifiee ? 1 : 0,
+        publier ? 1 : 0,
       ],
     );
     ajoutees += 1;
-    if (verification.verifiee) publiees += 1;
+    if (publier) publiees += 1;
   }
 
   return { ajoutees, publiees, examinees: propositions.length };

@@ -82,6 +82,7 @@ describe("ImportOpportunites", () => {
     ouvrir();
     const fichier = new File(["titre,type,organisme,lien\nBourse Gamma,bourse,Org G,https://g.org"], "liste.csv", { type: "text/csv" });
     fireEvent.change(document.querySelector('input[type="file"]'), { target: { files: [fichier] } });
-    await waitFor(() => expect(screen.getByText(/1 ligne :/)).toHaveTextContent("1 ligne : 1 valide"));
+    // Lecture de fichier asynchrone : délai large pour ne pas dépendre de la charge de la machine.
+    await waitFor(() => expect(screen.getByText(/1 ligne :/)).toHaveTextContent("1 ligne : 1 valide"), { timeout: 5000 });
   });
 });

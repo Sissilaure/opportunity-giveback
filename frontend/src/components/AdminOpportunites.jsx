@@ -27,6 +27,7 @@ const FORMULAIRE_VIDE = {
 
 export default function AdminOpportunites() {
   const [aVerifier, setAVerifier] = useState([]);
+  const [publicationAuto, setPublicationAuto] = useState(null);
   const [chargement, setChargement] = useState(true);
   const [actionEnCours, setActionEnCours] = useState({});
   const [rechercheEnCours, setRechercheEnCours] = useState(false);
@@ -40,7 +41,10 @@ export default function AdminOpportunites() {
 
   function chargerAVerifier() {
     adminFetchOpportunites("a_verifier")
-      .then((data) => setAVerifier(data.opportunites))
+      .then((data) => {
+        setAVerifier(data.opportunites);
+        setPublicationAuto(Boolean(data.publicationAuto));
+      })
       .catch(() => {})
       .finally(() => setChargement(false));
   }
@@ -142,6 +146,17 @@ export default function AdminOpportunites() {
           </button>
         </div>
       </div>
+
+      {publicationAuto !== null && (
+        <p
+          className={`mt-3 rounded-lg px-3 py-2 text-sm ${publicationAuto ? "bg-accent-light text-ink" : "bg-success-bg text-success"}`}
+          role="note"
+        >
+          {publicationAuto
+            ? "Publication automatique activée : les fiches dont la source officielle est reconnue sont publiées sans validation."
+            : "Mode prudent : l'IA prépare les fiches, rien n'est publié sans votre validation. Relisez, puis cliquez sur « Publier »."}
+        </p>
+      )}
 
       {rechercheMessage && (
         <p role="status" className="mt-3 text-sm text-muted">
@@ -253,6 +268,17 @@ export default function AdminOpportunites() {
             </div>
             <p className="mt-1 text-sm text-muted">{o.organisme}</p>
             {o.publicEligible && <p className="mt-2 text-sm text-ink/80">{o.publicEligible}</p>}
+            {o.criteres.length > 0 && (
+              <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-ink/80">
+                {o.criteres.slice(0, 5).map((critere) => (
+                  <li key={critere}>{critere}</li>
+                ))}
+              </ul>
+            )}
+            <p className="mt-2 text-sm text-ink/80">
+              <span className="font-semibold">Date limite :</span>{" "}
+              {o.dateEcheance ? new Date(o.dateEcheance).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }) : "non précisée"}
+            </p>
             {lienSur(o.lienSource) ? (
               <a
                 href={lienSur(o.lienSource)}

@@ -193,21 +193,21 @@ scholars4dev, Opportunity Desk, Opportunities for Africans ; modifiable avec `VE
 l'IA en extrait la fiche **en français** (titre, organisme, public, critères, pièces, date limite *seulement si elle est
 écrite*) et désigne, **par son numéro** dans la liste des liens de l'article, la page officielle de l'organisme. Le serveur
 lit alors cette page officielle (`safeFetch.js` + `verification.js`) : si le programme et l'organisme y figurent, la fiche est
-**publiée directement** avec l'image de l'organisme ; sinon elle reste en attente et est retentée chaque jour. Les adresses typiques des fausses bourses sont **refusées d'office** (`domaineSuspect` dans `verification.js` : http, adresse IP, noms trompeurs, liens raccourcis, hébergements gratuits, extensions à risque, y compris après redirection) : la fiche reste alors « à vérifier ». Les listes
+**publiée directement** avec l'image de l'organisme *si la publication automatique est activée* (`AUTO_PUBLISH=true`) ; sinon, ou si la page ne se vérifie pas, elle reste « à vérifier » (avec l'image et le résumé déjà prêts) et est retentée chaque jour. Les adresses typiques des fausses bourses sont **refusées d'office** (`domaineSuspect` dans `verification.js` : http, adresse IP, noms trompeurs, liens raccourcis, hébergements gratuits, extensions à risque, y compris après redirection) : la fiche reste alors « à vérifier ». Les listes
 (« Top 10 bourses »), opportunités échues, doublons et articles sans lien officiel sont ignorés. Chaque article n'est examiné
 qu'une fois (table `veille_article`). Seuls des **faits** sont repris, jamais le texte des articles. Pourquoi des flux et pas
 « l'IA cherche sur le web » : la clé Gemini gratuite n'a pas accès à la recherche web (quota nul) ; de mémoire, l'IA se trompe
-souvent de lien. Réglages : `VEILLE=false` (désactive), `VEILLE_MAX_ARTICLES` (12 par passage), `AUTO_PUBLISH=false`
-(tout attend une validation humaine).
+souvent de lien. Réglages : `VEILLE=false` (désactive), `VEILLE_MAX_ARTICLES` (12 par passage), `AUTO_PUBLISH`
+(**désactivée par défaut** : l'IA prépare, une personne publie depuis `/admin` ; `AUTO_PUBLISH=true` l'active quand la qualité a été constatée).
 
 ## Publication automatique des opportunités
 
 La recherche IA (chaque jour à 6 h UTC et au démarrage) propose des pistes. Pour chacune, le serveur **lit la page
 officielle** (`safeFetch.js`, protégé contre le SSRF : adresses internes, redirections, taille et délai bornés) et vérifie
-que le programme et l'organisme y figurent (`verification.js`). Si oui, la fiche est **publiée directement**, avec
+que le programme et l'organisme y figurent (`verification.js`). Si oui, et si `AUTO_PUBLISH=true`, la fiche est **publiée directement**, avec
 l'image d'aperçu de l'organisme (balise Open Graph, https uniquement) et la mention « Source officielle vérifiée » :
 elle n'est pas présentée comme relue par un humain. Sinon elle reste « à vérifier » et est retentée chaque jour.
-`AUTO_PUBLISH=false` rétablit la validation humaine systématique. Les colonnes `image_url` et `verification_auto` sont
+**Par défaut, rien n'est publié sans validation humaine** (mode prudent, annoncé par un bandeau dans `/admin`) ; la source est tout de même lue pour préparer l'image et aider la personne qui valide. Les colonnes `image_url` et `verification_auto` sont
 ajoutées toutes seules à la table `opportunite`.
 
 ## Import en lot (espace équipe)

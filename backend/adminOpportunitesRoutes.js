@@ -6,6 +6,7 @@ const { AppError, asyncHandler } = require("./errors");
 const { formatOpportunite, findOrCreateStructure } = require("./opportunites");
 const { rechercherNouvellesOpportunites } = require("./discoveryIA");
 const createRateLimiter = require("./rateLimit");
+const { autoPublier } = require("./publication");
 const { importSchema, importerOpportunites, enrichirImages: enrichirImagesParDefaut } = require("./importOpportunites");
 
 const STATUTS_VALIDES = ["verifiee", "a_verifier", "expiree"];
@@ -42,7 +43,7 @@ function createAdminOpportunitesRouter(pool, { enrichirImages = enrichirImagesPa
         ORDER BY o.id DESC
       `;
       const [rows] = await pool.query(sql, statut ? [statut] : []);
-      res.json({ opportunites: rows.map(formatOpportunite) });
+      res.json({ opportunites: rows.map(formatOpportunite), publicationAuto: autoPublier() });
     }),
   );
 

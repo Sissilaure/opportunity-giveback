@@ -16,6 +16,7 @@ const { TYPES_OPPORTUNITE } = require("./schemas");
 const { safeHttpUrl } = require("./security");
 const { findOrCreateStructure, joursAvant } = require("./opportunites");
 const { normaliserTitre } = require("./importOpportunites");
+const { autoPublier } = require("./publication");
 
 const FLUX_PAR_DEFAUT = [
   "https://www.scholars4dev.com/feed/",
@@ -190,7 +191,6 @@ async function veilleSources(pool, options = {}) {
   } = options;
   const stats = { examines: 0, publiees: 0, enAttente: 0, ignorees: 0, erreurs: 0 };
   if (process.env.VEILLE === "false" || (!process.env.GEMINI_API_KEY && generer === generateJson)) return stats;
-  const autoPublier = process.env.AUTO_PUBLISH !== "false";
 
   // 1. Articles récents de chaque flux (un flux en panne n'empêche pas les autres), pris à tour de rôle.
   const parFlux = [];
@@ -260,16 +260,19 @@ async function veilleSources(pool, options = {}) {
 
     const siteOfficiel = new URL(lienOfficiel).origin;
     // La page officielle est en général dans la langue d'origine : on contrôle avec le titre ORIGINAL de l'article.
-    const verification = autoPublier
-      ? await Promise.resolve(verifier({ titre: article.titre, organisme: ia.organisme, lienSource: lienOfficiel, siteWeb: siteOfficiel })).catch(() => ({ verifiee: false, imageUrl: null }))
-      : { verifiee: false, imageUrl: null };
+    // La page officielle est lue dans tous les cas (elle fournit l'image et un signal utile à la personne qui valide) ;
+    // mais la fiche n'est PUBLIÉE sans humain que si la publication automatique est activée (AUTO_PUBLISH=true).
+    const verification = await Promise.resolve(
+      verifier({ titre: article.titre, organisme: ia.organisme, lienSource: lienOfficiel, siteWeb: siteOfficiel }),
+    ).catch(() => ({ verifiee: false, imageUrl: null }));
+    const publier = autoPublier() && verification.verifiee;
 
     const idStructure = await findOrCreateStructure(pool, ia.organisme.slice(0, 255), siteOfficiel.length <= 255 ? siteOfficiel : null);
     await pool.query(
       `INSERT INTO opportunite
          (titre, type, id_structure, public_eligible, criteres, pieces_requises, date_echeance, lien_source,
           date_verification, statut, image_url, verification_auto)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ${verification.verifiee ? "NOW()" : "NULL"}, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ${publier ? "NOW()" : "NULL"}, ?, ?, ?)`,
       [
         ia.titre.slice(0, 255),
         ia.type,
@@ -279,16 +282,16 @@ async function veilleSources(pool, options = {}) {
         ia.piecesRequises.filter(Boolean).join("\n"),
         echeance.date || null,
         lienOfficiel.slice(0, 500),
-        verification.verifiee ? "verifiee" : "a_verifier",
+        publier ? "verifiee" : "a_verifier",
         verification.imageUrl || null,
-        verification.verifiee ? 1 : 0,
+        publier ? 1 : 0,
       ],
     );
     titres.add(normaliserTitre(ia.titre));
     liensConnus.add(lienOfficiel);
-    if (verification.verifiee) stats.publiees += 1;
+    if (publier) stats.publiees += 1;
     else stats.enAttente += 1;
-    await noter(article, verification.verifiee ? "publiee" : "en_attente");
+    await noter(article, publier ? "publiee" : "en_attente");
   }
   return stats;
 }

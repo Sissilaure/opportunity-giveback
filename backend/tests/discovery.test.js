@@ -15,7 +15,7 @@ const prop = (titre, extra = {}) => ({
 let pool;
 beforeEach(() => {
   process.env.GEMINI_API_KEY = "cle-test";
-  delete process.env.AUTO_PUBLISH;
+  process.env.AUTO_PUBLISH = "true"; // mode automatique ; le mode prudent est testé séparément
   pool = {
     insertions: [],
     query: vi.fn(async (sql, params) => {
@@ -30,6 +30,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.restoreAllMocks();
   delete process.env.GEMINI_API_KEY;
+  delete process.env.AUTO_PUBLISH;
 });
 
 describe("recherche automatique : publication après vérification de la source", () => {
@@ -53,14 +54,17 @@ describe("recherche automatique : publication après vérification de la source"
     expect(douteuse.params.at(-1)).toBe(0);
   });
 
-  it("ne publie rien si AUTO_PUBLISH=false (validation humaine systématique)", async () => {
-    process.env.AUTO_PUBLISH = "false";
+  it("mode prudent (par défaut) : la source est lue mais rien n'est publié sans une personne de l'équipe", async () => {
+    delete process.env.AUTO_PUBLISH;
     vi.spyOn(globalThis, "fetch").mockResolvedValue(reponseGemini([prop("Sure")]));
-    const verifier = vi.fn();
+    const verifier = vi.fn(async () => ({ verifiee: true, imageUrl: "https://org.example/hero.jpg", raison: "ok" }));
     const r = await rechercherNouvellesOpportunites(pool, { verifier });
-    expect(verifier).not.toHaveBeenCalled();
+    expect(verifier).toHaveBeenCalledTimes(1);
     expect(r.publiees).toBe(0);
+    expect(pool.insertions[0].sql).not.toContain("NOW()");
     expect(pool.insertions[0].params).toContain("a_verifier");
+    expect(pool.insertions[0].params).toContain("https://org.example/hero.jpg");
+    expect(pool.insertions[0].params.at(-1)).toBe(0);
   });
 
   it("n'ajoute jamais une piste dont le lien source n'est pas http(s), même si la vérification passerait", async () => {

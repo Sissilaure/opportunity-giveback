@@ -499,4 +499,27 @@ describe("Sécurité", () => {
     expect(sqls.filter((s) => s.includes("COUNT"))).toHaveLength(2);
     expect(sqls.every((s) => !s.includes("COUNT") || s.includes("CURDATE()"))).toBe(true);
   });
+
+  it("l'écran de l'équipe sait si la publication automatique est active (prudent par défaut)", async () => {
+    const ancien = process.env.AUTO_PUBLISH;
+    const hash = await bcrypt.hash("motdepasse", 4);
+    const connecter = async () => {
+      // Email et adresse différents à chaque appel : les verrous de connexion (par compte et par IP) sont partagés dans ce fichier.
+      const agent = request.agent(app);
+      const unique = `${Date.now()}${Math.floor(Math.random() * 1e6)}`;
+      pool.query.mockResolvedValueOnce([[{ id: 1, email: `admin${unique}@test.org`, password_hash: hash }], []]);
+      await agent.post("/api/admin/login").set("X-Forwarded-For", `10.55.${Math.floor(Math.random() * 250)}.${Math.floor(Math.random() * 250)}`).send({ email: `admin${unique}@test.org`, motDePasse: "motdepasse" });
+      return agent;
+    };
+    delete process.env.AUTO_PUBLISH;
+    let agent = await connecter();
+    pool.query.mockResolvedValueOnce([[], []]);
+    expect((await agent.get("/api/admin/opportunites?statut=a_verifier")).body.publicationAuto).toBe(false);
+    process.env.AUTO_PUBLISH = "true";
+    agent = await connecter();
+    pool.query.mockResolvedValueOnce([[], []]);
+    expect((await agent.get("/api/admin/opportunites?statut=a_verifier")).body.publicationAuto).toBe(true);
+    if (ancien === undefined) delete process.env.AUTO_PUBLISH;
+    else process.env.AUTO_PUBLISH = ancien;
+  });
 });

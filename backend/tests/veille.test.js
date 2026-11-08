@@ -60,12 +60,15 @@ const options = (pages, reponses, extra = {}) => ({
 
 beforeEach(() => {
   process.env.GEMINI_API_KEY = "cle-test";
-  delete process.env.AUTO_PUBLISH;
+  process.env.AUTO_PUBLISH = "true"; // les tests ci-dessous décrivent le mode automatique ; le mode prudent a ses propres tests
   delete process.env.VEILLE;
   verifOk.mockClear();
   pool = faussePool();
 });
-afterEach(() => { delete process.env.GEMINI_API_KEY; });
+afterEach(() => {
+  delete process.env.GEMINI_API_KEY;
+  delete process.env.AUTO_PUBLISH;
+});
 
 describe("analyserFlux", () => {
   it("extrait titre, lien, date et résumé, et ignore les liens non http(s)", () => {
@@ -191,11 +194,27 @@ describe("veilleSources", () => {
     expect(ia).toHaveBeenCalledTimes(2);
   });
 
-  it("AUTO_PUBLISH=false : tout attend une validation humaine, sans lire la page officielle", async () => {
-    process.env.AUTO_PUBLISH = "false";
-    await veilleSources(pool, options({ "https://actus.example/alpha": ARTICLE(LIENS_OK) }, { "Alpha Fellowship 2027 (Funded)": iaOk() }, { max: 1 }));
-    expect(verifOk).not.toHaveBeenCalled();
-    expect(insertions[0].params).toContain("a_verifier");
+  it("mode prudent (par défaut, AUTO_PUBLISH absent) : la page est lue et l'image gardée, mais RIEN n'est publié sans une personne", async () => {
+    delete process.env.AUTO_PUBLISH;
+    const stats = await veilleSources(pool, options({ "https://actus.example/alpha": ARTICLE(LIENS_OK) }, { "Alpha Fellowship 2027 (Funded)": iaOk() }, { max: 1 }));
+    expect(stats).toMatchObject({ publiees: 0, enAttente: 1 });
+    expect(verifOk).toHaveBeenCalledTimes(1); // la source est tout de même contrôlée, pour aider la personne qui valide
+    const { sql, params } = insertions[0];
+    expect(sql).not.toContain("NOW()");
+    expect(params).toContain("a_verifier");
+    expect(params).not.toContain("verifiee");
+    expect(params).toContain("https://alpha.org/hero.jpg"); // l'image est conservée pour le jour de la publication
+    expect(params.at(-1)).toBe(0);
+    expect(notes[0][2]).toBe("en_attente");
+  });
+
+  it("AUTO_PUBLISH=false est équivalent au mode prudent, et seule la valeur « true » active la publication automatique", async () => {
+    for (const valeur of ["false", "1", "yes", "TRUE", ""]) {
+      process.env.AUTO_PUBLISH = valeur;
+      pool = faussePool();
+      const stats = await veilleSources(pool, options({ "https://actus.example/alpha": ARTICLE(LIENS_OK) }, { "Alpha Fellowship 2027 (Funded)": iaOk() }, { max: 1 }));
+      expect(stats.publiees, `AUTO_PUBLISH=${valeur}`).toBe(0);
+    }
   });
 
   it("VEILLE=false désactive tout, sans lire un seul flux", async () => {
