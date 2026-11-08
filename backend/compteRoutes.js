@@ -13,14 +13,18 @@ const STATUTS_SUIVI = ["a_faire", "en_cours", "soumise", "acceptee", "refusee"];
 const MAX_SUIVIS = 200;
 const TRENTE_JOURS_MS = 30 * 24 * 60 * 60 * 1000;
 
+// Avec un minimum de 8 caractères, c'est cette liste qui protège : on refuse les mots de passe les plus utilisés au monde.
 const MOTS_DE_PASSE_FAIBLES = new Set([
-  "1234567890", "12345678910", "0123456789", "azertyuiop", "qwertyuiop", "motdepasse", "motdepasse1", "password123",
-  "passw0rd123", "iloveyou123", "bienvenue1", "yeelen2026", "yeelen12345",
+  "12345678", "123456789", "1234567890", "12345678910", "0123456789", "87654321", "11111111", "00000000", "88888888",
+  "azertyui", "azertyuiop", "azerty123", "azerty12", "azerty1234", "qwertyui", "qwertyuiop", "qwerty123", "qwerty12", "abcd1234", "abc12345", "a1b2c3d4",
+  "motdepasse", "motdepasse1", "motdepasse123", "password", "password1", "password12", "password123", "passw0rd", "passw0rd123",
+  "iloveyou", "iloveyou1", "iloveyou123", "bienvenue", "bienvenue1", "bonjour123", "soleil123", "doudou123", "chocolat1",
+  "football", "football1", "football123", "admin123", "administrateur", "welcome1", "welcome123", "letmein1", "yeelen2026", "yeelen12345", "yeelen123", "giveback", "giveback123", "burkina123", "ouaga2026",
 ]);
 
 const motDePasse = z
   .string()
-  .min(10, "Le mot de passe doit contenir au moins 10 caractères.")
+  .min(8, "Le mot de passe doit contenir au moins 8 caractères.")
   .max(200, "Mot de passe trop long.");
 
 const inscriptionSchema = z.object({

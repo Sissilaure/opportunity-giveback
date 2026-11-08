@@ -41,7 +41,7 @@ describe("POST /api/compte/inscription", () => {
 
   it("refuse un mot de passe trop court, trop faible, ou identique à l'email", async () => {
     const app = nouvelleApp();
-    for (const motDePasse of ["court", "1234567890", "aaaaaaaaaaaa", "motdepasse"]) {
+    for (const motDePasse of ["court", "1234567", "12345678", "azerty123", "Password1", "aaaaaaaaaaaa", "motdepasse"]) {
       const res = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "a@b.org", motDePasse });
       expect(res.status, motDePasse).toBe(400);
     }
@@ -284,5 +284,11 @@ describe("suppression du compte", () => {
     expect(sqls.some((s) => /DELETE FROM utilisateur/.test(s))).toBe(true);
     const apres = await agent.get("/api/compte/suivi");
     expect(apres.status).toBe(401); // session détruite
+  });
+
+  it("accepte exactement 8 caractères quand le mot de passe n'est pas courant", async () => {
+    pool.query.mockResolvedValueOnce([{ insertId: 31 }, []]);
+    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "huit@exemple.org", motDePasse: "pluie-7x" });
+    expect(res.status).toBe(201);
   });
 });

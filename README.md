@@ -172,7 +172,7 @@ hébergement gratuit qui se met en veille) ne déconnecte donc pas l'équipe.
 
 ## Comptes, suivi et notifications
 
-- **Compte facultatif** : email + mot de passe (≥ 10 caractères), session de 30 jours. Hachage **scrypt** (`motDePasse.js`) : il
+- **Compte facultatif** : email + mot de passe (≥ 8 caractères, hors mots de passe courants refusés), session de 30 jours. Hachage **scrypt** (`motDePasse.js`) : il
   s'exécute dans le pool de threads de Node, alors que bcryptjs gelait tout le serveur à chaque connexion (mesuré : 10
   connexions simultanées = 3,6 s d'attente pour tous les visiteurs ; avec scrypt, les autres pages ne sont plus ralenties). Aucun email
   n'est envoyé : tout fonctionne sans service d'envoi. Pas de « mot de passe oublié » automatique pour l'instant (il

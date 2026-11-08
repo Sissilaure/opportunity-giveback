@@ -101,7 +101,7 @@ export default function Connexion() {
           id="mdp"
           type={voir ? "text" : "password"}
           required
-          minLength={inscriptionMode ? 10 : undefined}
+          minLength={inscriptionMode ? 8 : undefined}
           maxLength={200}
           autoComplete={inscriptionMode ? "new-password" : "current-password"}
           value={motDePasse}
@@ -111,7 +111,7 @@ export default function Connexion() {
         />
         {inscriptionMode && (
           <p id="aide-mdp" className="mt-1.5 text-xs text-muted">
-            10 caractères minimum. Une phrase facile à retenir fonctionne très bien.
+            8 caractères minimum, évitez les mots de passe trop courants. Une phrase facile à retenir fonctionne très bien.
           </p>
         )}
 
