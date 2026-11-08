@@ -51,7 +51,10 @@ const REDIRECTIONS = new Set([301, 302, 303, 307, 308]);
  * redirection), contenus non HTML, réponses trop lourdes, lenteur.
  * `autoriserPrive` n'existe que pour les tests (serveur local) : ne jamais l'activer en production.
  */
-async function lireHtml(url, { delai = 8000, maxOctets = 400_000, maxRedirections = 3, autoriserPrive = false } = {}) {
+async function lireHtml(
+  url,
+  { delai = 8000, maxOctets = 400_000, maxRedirections = 3, autoriserPrive = false, accepter = /text\/html|application\/xhtml/i } = {},
+) {
   let courante = url;
   for (let saut = 0; saut <= maxRedirections; saut++) {
     const u = new URL(courante);
@@ -69,10 +72,14 @@ async function lireHtml(url, { delai = 8000, maxOctets = 400_000, maxRedirection
           timeout: delai,
           headers: {
             "User-Agent": "YeelenBot/1.0 (+vérification de sources d'opportunités)",
-            Accept: "text/html,application/xhtml+xml",
+            Accept: "text/html,application/xhtml+xml,application/rss+xml,application/xml;q=0.9",
           },
           // Connexion forcée vers l'IP déjà validée.
-          lookup: (_h, _o, cb) => cb(null, cible.address, cible.family || net.isIP(cible.address)),
+          // Node récent appelle `lookup` avec { all: true } et attend alors une LISTE d'adresses (sinon : « Invalid IP address »).
+          lookup: (_h, opts, cb) => {
+            const famille = cible.family || net.isIP(cible.address);
+            return opts && opts.all ? cb(null, [{ address: cible.address, family: famille }]) : cb(null, cible.address, famille);
+          },
         },
         (res) => resolve({ res, req }),
       );
@@ -89,7 +96,7 @@ async function lireHtml(url, { delai = 8000, maxOctets = 400_000, maxRedirection
     }
 
     const type = String(res.headers["content-type"] || "");
-    if (!/text\/html|application\/xhtml/i.test(type)) {
+    if (!accepter.test(type)) {
       res.resume();
       return { url: courante, status: res.statusCode, html: "" };
     }

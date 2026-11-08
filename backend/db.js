@@ -161,8 +161,22 @@ async function initializeCompteTables(db = pool) {
   `);
 }
 
+// Articles déjà examinés par la veille automatique : on ne les relit ni ne les re-soumet à l'IA le lendemain.
+async function initializeVeilleTable(db = pool) {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS veille_article (
+      url VARCHAR(500) PRIMARY KEY,
+      titre VARCHAR(255) NOT NULL,
+      resultat ENUM('publiee', 'en_attente', 'ignoree') NOT NULL,
+      traite_le DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_veille_traite (traite_le)
+    ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
+  `);
+}
+
 module.exports = {
   pool,
+  initializeVeilleTable,
   initializeQuestionsTable,
   initializeAdminTable,
   initializeNewsletterTable,

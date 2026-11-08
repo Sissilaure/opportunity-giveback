@@ -8,9 +8,11 @@ const {
   initializeNewsletterTable,
   initializeOpportuniteColumns,
   initializeCompteTables,
+  initializeVeilleTable,
 } = require("./db");
 const { rechercherNouvellesOpportunites, verifierEnAttente } = require("./discoveryIA");
 const { marquerExpirees } = require("./opportunites");
+const { veilleSources } = require("./veille");
 const MySQLSessionStore = require("./sessionStore");
 
 // Sessions stockées en base (table `sessions`, créée automatiquement) plutôt qu'en
@@ -25,6 +27,17 @@ const PORT = process.env.PORT || 4000;
 // rechercherNouvellesOpportunites() est un no-op silencieux — pas besoin de cliquer sur un
 // bouton pour que ça tourne, c'est ce cycle automatique qui alimente la file "à vérifier".
 async function cycleAutomatique() {
+  // 1) Veille de sources réelles et récentes (la plus fiable) : lecture, vérification de la page officielle, publication.
+  try {
+    const v = await veilleSources(pool);
+    if (v.examines) {
+      console.log(`Veille automatique : ${v.examines} article(s) lu(s), ${v.publiees} publié(s), ${v.enAttente} en attente, ${v.ignorees} ignoré(s), ${v.erreurs} erreur(s).`);
+    }
+  } catch (err) {
+    console.error("Erreur veille automatique:", err);
+  }
+
+  // 2) Pistes proposées de mémoire par l'IA (moins fiables : publiées seulement si la source se vérifie).
   try {
     const { ajoutees, publiees, examinees } = await rechercherNouvellesOpportunites(pool);
     if (examinees) {
@@ -59,6 +72,7 @@ Promise.all([
   initializeNewsletterTable(),
   initializeOpportuniteColumns(),
   initializeCompteTables(),
+  initializeVeilleTable(),
 ])
   .then(() => {
     app.listen(PORT, () => console.log(`Backend Yeelen sur http://localhost:${PORT}`));

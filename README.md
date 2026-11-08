@@ -186,6 +186,20 @@ hébergement gratuit qui se met en veille) ne déconnecte donc pas l'équipe.
   depuis « Mon suivi » (confirmation par mot de passe) et efface toutes ses données.
 - **API** : `/api/compte/{inscription,connexion,deconnexion,moi}`, `/api/compte/suivi`, `/api/compte/notifications`.
 
+### Veille automatique (sources réelles)
+
+Chaque jour (6 h UTC) et à chaque démarrage, `veille.js` lit des **flux RSS publics d'opportunités** (par défaut :
+scholars4dev, Opportunity Desk, Opportunities for Africans ; modifiable avec `VEILLE_FLUX`). Pour chaque nouvel article :
+l'IA en extrait la fiche **en français** (titre, organisme, public, critères, pièces, date limite *seulement si elle est
+écrite*) et désigne, **par son numéro** dans la liste des liens de l'article, la page officielle de l'organisme. Le serveur
+lit alors cette page officielle (`safeFetch.js` + `verification.js`) : si le programme et l'organisme y figurent, la fiche est
+**publiée directement** avec l'image de l'organisme ; sinon elle reste en attente et est retentée chaque jour. Les listes
+(« Top 10 bourses »), opportunités échues, doublons et articles sans lien officiel sont ignorés. Chaque article n'est examiné
+qu'une fois (table `veille_article`). Seuls des **faits** sont repris, jamais le texte des articles. Pourquoi des flux et pas
+« l'IA cherche sur le web » : la clé Gemini gratuite n'a pas accès à la recherche web (quota nul) ; de mémoire, l'IA se trompe
+souvent de lien. Réglages : `VEILLE=false` (désactive), `VEILLE_MAX_ARTICLES` (12 par passage), `AUTO_PUBLISH=false`
+(tout attend une validation humaine).
+
 ## Publication automatique des opportunités
 
 La recherche IA (chaque jour à 6 h UTC et au démarrage) propose des pistes. Pour chacune, le serveur **lit la page

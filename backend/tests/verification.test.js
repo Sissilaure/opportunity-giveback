@@ -63,12 +63,21 @@ describe("lireHtml : comportement (serveur local, mode test)", () => {
       res.setHeader("Content-Type", "text/html");
       res.end("introuvable");
     });
-    await new Promise((r) => serveur.listen(0, "127.0.0.1", r));
-    base = `http://127.0.0.1:${serveur.address().port}`;
+    // « localhost » : toutes ces lectures passent par la résolution de nom (le cas réel), pas par une IP directe.
+    await new Promise((r) => serveur.listen(0, "localhost", r));
+    base = `http://localhost:${serveur.address().port}`;
   });
   afterAll(() => serveur.close());
 
   const opts = { autoriserPrive: true };
+  it("lit une page désignée par un NOM de domaine (pas seulement une adresse IP)", async () => {
+    // Régression : avec Node récent, la résolution forcée vers l'IP validée échouait pour tout nom de domaine.
+    const port = new URL(base).port;
+    const r = await lireHtml(`http://localhost:${port}/ok`, opts);
+    expect(r.status).toBe(200);
+    expect(r.html).toContain("Chevening");
+  });
+
   it("lit une page HTML", async () => {
     const r = await lireHtml(`${base}/ok`, opts);
     expect(r.status).toBe(200);
