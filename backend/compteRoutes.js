@@ -31,6 +31,8 @@ const inscriptionSchema = z.object({
   email: z.string().trim().toLowerCase().email("Adresse email invalide.").max(255, "Email trop long."),
   motDePasse,
   prenom: z.string().trim().max(80, "Prénom trop long.").optional().default(""),
+  // Acceptation explicite de la politique de confidentialité : sans elle, pas de compte.
+  consentement: z.literal(true, { errorMap: () => ({ message: "Vous devez accepter la politique de confidentialité pour créer un compte." }) }),
 });
 
 const connexionSchema = z.object({

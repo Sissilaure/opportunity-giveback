@@ -55,9 +55,17 @@ describe("Connexion", () => {
     rendre("/connexion?mode=inscription");
     fireEvent.change(await screen.findByLabelText(/Adresse email/), { target: { value: "n@b.org" } });
     fireEvent.change(screen.getByLabelText("Mot de passe"), { target: { value: "une-phrase-de-passe" } });
+    fireEvent.click(screen.getByLabelText(/politique de confidentialité/));
     fireEvent.click(screen.getByRole("button", { name: "Créer mon compte" }));
     expect(await screen.findByText("page suivi")).toBeInTheDocument();
     await waitFor(() => expect(api.importerSuiviCompte).toHaveBeenCalledWith([4, 9]));
+  });
+
+  it("exige de cocher la politique de confidentialité pour créer un compte", async () => {
+    rendre("/connexion?mode=inscription");
+    const case_ = await screen.findByLabelText(/politique de confidentialité/);
+    expect(case_).toBeRequired();
+    expect(case_).not.toBeChecked();
   });
 
   it("ne redirige jamais vers un autre site", async () => {

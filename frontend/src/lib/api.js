@@ -126,8 +126,8 @@ export async function compteMoi() {
   return request("/api/compte/moi");
 }
 
-export async function compteInscription({ email, motDePasse, prenom }) {
-  return request("/api/compte/inscription", { method: "POST", body: JSON.stringify({ email, motDePasse, prenom }) });
+export async function compteInscription({ email, motDePasse, prenom, consentement }) {
+  return request("/api/compte/inscription", { method: "POST", body: JSON.stringify({ email, motDePasse, prenom, consentement }) });
 }
 
 export async function compteConnexion({ email, motDePasse }) {

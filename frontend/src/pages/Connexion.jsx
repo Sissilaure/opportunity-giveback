@@ -18,6 +18,7 @@ export default function Connexion() {
   const [motDePasse, setMotDePasse] = useState("");
   const [prenom, setPrenom] = useState("");
   const [voir, setVoir] = useState(false);
+  const [accepte, setAccepte] = useState(false);
   const [erreur, setErreur] = useState("");
   const [envoi, setEnvoi] = useState(false);
 
@@ -36,7 +37,7 @@ export default function Connexion() {
     setErreur("");
     setEnvoi(true);
     try {
-      if (inscriptionMode) await inscription({ email, motDePasse, prenom });
+      if (inscriptionMode) await inscription({ email, motDePasse, prenom, consentement: accepte });
       else await connexion({ email, motDePasse });
       // Reprend sans effort le suivi gardé sur cet appareil avant la création du compte.
       const locaux = getSuivi();
@@ -113,6 +114,26 @@ export default function Connexion() {
           <p id="aide-mdp" className="mt-1.5 text-xs text-muted">
             8 caractères minimum, évitez les mots de passe trop courants. Une phrase facile à retenir fonctionne très bien.
           </p>
+        )}
+
+        {inscriptionMode && (
+          <label htmlFor="consentement" className="mt-4 flex cursor-pointer items-start gap-3 text-sm text-ink">
+            <input
+              id="consentement"
+              type="checkbox"
+              required
+              checked={accepte}
+              onChange={(e) => setAccepte(e.target.checked)}
+              className="mt-0.5 h-5 w-5 shrink-0 accent-primary"
+            />
+            <span>
+              J'ai lu la{" "}
+              <Link to="/confidentialite" target="_blank" className="font-semibold text-primary underline">
+                politique de confidentialité
+              </Link>{" "}
+              et j'accepte que Yeelen enregistre mon email et mon suivi de candidatures.
+            </span>
+          </label>
         )}
 
         {erreur && (

@@ -25,10 +25,19 @@ async function connecter(app, adresse = ip()) {
 }
 
 describe("POST /api/compte/inscription", () => {
+  it("refuse de créer un compte sans l'acceptation de la politique de confidentialité", async () => {
+    for (const consentement of [undefined, false, "true", 1]) {
+      const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip())
+        .send({ email: "sans@consentement.org", motDePasse: "une-phrase-de-passe-solide", consentement });
+      expect(res.status, String(consentement)).toBe(400);
+    }
+    expect(pool.query).not.toHaveBeenCalled();
+  });
+
   it("crée un compte, ouvre la session et ne renvoie jamais le hash", async () => {
     pool.query.mockResolvedValueOnce([{ insertId: 12 }, []]);
     const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip())
-      .send({ email: "  Awa@Exemple.ORG ", motDePasse: "une-phrase-de-passe-solide", prenom: "Awa" });
+      .send({ consentement: true, email: "  Awa@Exemple.ORG ", motDePasse: "une-phrase-de-passe-solide", prenom: "Awa" });
     expect(res.status).toBe(201);
     expect(res.body.utilisateur).toEqual({ id: 12, email: "awa@exemple.org", prenom: "Awa" });
     expect(JSON.stringify(res.body)).not.toMatch(/hash|\$2/);
@@ -42,23 +51,23 @@ describe("POST /api/compte/inscription", () => {
   it("refuse un mot de passe trop court, trop faible, ou identique à l'email", async () => {
     const app = nouvelleApp();
     for (const motDePasse of ["court", "1234567", "12345678", "azerty123", "Password1", "aaaaaaaaaaaa", "motdepasse"]) {
-      const res = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "a@b.org", motDePasse });
+      const res = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ consentement: true, email: "a@b.org", motDePasse });
       expect(res.status, motDePasse).toBe(400);
     }
-    const memeQueEmail = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "longueadresse@b.org", motDePasse: "longueadresse@b.org" });
+    const memeQueEmail = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ consentement: true, email: "longueadresse@b.org", motDePasse: "longueadresse@b.org" });
     expect(memeQueEmail.status).toBe(400);
     expect(pool.query).not.toHaveBeenCalled();
   });
 
   it("refuse un email invalide avec un message en français", async () => {
-    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "pasunemail", motDePasse: "une-phrase-de-passe-solide" });
+    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ consentement: true, email: "pasunemail", motDePasse: "une-phrase-de-passe-solide" });
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("Adresse email invalide.");
   });
 
   it("répond 409 si le compte existe déjà", async () => {
     pool.query.mockRejectedValueOnce(Object.assign(new Error("dup"), { code: "ER_DUP_ENTRY", errno: 1062 }));
-    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "a@b.org", motDePasse: "une-phrase-de-passe-solide" });
+    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ consentement: true, email: "a@b.org", motDePasse: "une-phrase-de-passe-solide" });
     expect(res.status).toBe(409);
     expect(res.body.error).toMatch(/existe déjà/);
   });
@@ -69,7 +78,7 @@ describe("POST /api/compte/inscription", () => {
     const statuts = [];
     for (let i = 0; i < 41; i++) {
       // Mot de passe trop court : refusé avant toute écriture, mais chaque tentative compte dans la limite.
-      const r = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", adresse).send({ email: `u${i}@b.org`, motDePasse: "court" });
+      const r = await request(app).post("/api/compte/inscription").set("X-Forwarded-For", adresse).send({ consentement: true, email: `u${i}@b.org`, motDePasse: "court" });
       statuts.push(r.status);
     }
     expect(statuts.slice(0, 40).every((s) => s === 400)).toBe(true);
@@ -288,7 +297,7 @@ describe("suppression du compte", () => {
 
   it("accepte exactement 8 caractères quand le mot de passe n'est pas courant", async () => {
     pool.query.mockResolvedValueOnce([{ insertId: 31 }, []]);
-    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ email: "huit@exemple.org", motDePasse: "pluie-7x" });
+    const res = await request(nouvelleApp()).post("/api/compte/inscription").set("X-Forwarded-For", ip()).send({ consentement: true, email: "huit@exemple.org", motDePasse: "pluie-7x" });
     expect(res.status).toBe(201);
   });
 });

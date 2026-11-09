@@ -33,6 +33,20 @@ export default function Confidentialite() {
           <li>Aucune donnée n'est vendue ni transmise à des tiers.</li>
         </ul>
 
+        <h2>Cookies et suivi</h2>
+        <p>
+          Nous n'utilisons aucun cookie publicitaire ni outil de statistiques. Seul un cookie technique de session est posé
+          quand vous vous connectez à votre compte : il vous garde connecté·e et ne sert à rien d'autre. Votre suivi local est
+          gardé dans votre navigateur, sur votre appareil.
+        </p>
+
+        <h2>Votre accord</h2>
+        <p>
+          La création d'un compte demande de cocher que vous avez lu cette page et que vous acceptez l'enregistrement de votre
+          email et de votre suivi. Sans cet accord, aucun compte n'est créé. Vous pouvez supprimer votre compte à tout moment
+          depuis la page Suivi.
+        </p>
+
         <h2>Intelligence artificielle</h2>
         <p>
           La recherche intelligente s'appuie sur un modèle d'IA qui peut se tromper. Vérifiez toujours la source
