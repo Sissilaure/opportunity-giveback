@@ -43,6 +43,14 @@ const pool = mysql.createPool({
   connectionLimit: 5,
   queueLimit: 0,
   ssl: sslConfig,
+  // Hébergeur gratuit + base en ligne : les connexions inactives sont coupées par le réseau sans prévenir, et une requête
+  // posée sur une connexion morte reste alors bloquée. On garde la connexion « vivante », on recycle celles qui dorment
+  // et on n'attend pas indéfiniment l'ouverture d'une nouvelle.
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 10000,
+  connectTimeout: 10000,
+  maxIdle: 2,
+  idleTimeout: 30000,
 });
 
 async function initializeQuestionsTable() {
